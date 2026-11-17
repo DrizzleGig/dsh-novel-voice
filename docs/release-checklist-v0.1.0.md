@@ -73,6 +73,6 @@
 |---|---|
 | GitHub 仓库 | [DrizzleGig/dsh-novel-voice](https://github.com/DrizzleGig/dsh-novel-voice)：`main` + `v0.1.0` tag |
 | GitHub Release | [v0.1.0](https://github.com/DrizzleGig/dsh-novel-voice/releases/tag/v0.1.0) |
-| npm | 已提交 `dsh-novel-voice@0.1.0`；新包首版走 npm 的 staged publishing 审核，registry 暂为 `0.0.0-stage` 占位包，审核通过后 `0.1.0` 上线 |
+| npm | [dsh-novel-voice@0.1.0](https://www.npmjs.com/package/dsh-novel-voice)：已上线（`latest` = 0.1.0；新包首版先出 `0.0.0-stage` 占位，审核通过后 0.1.0 生效） |
 
 发布 commit：`release: v0.1.0 — 创作风格：导入作品学写法，写前简报，写后定点改 AI 味`（`Co-authored-by: MiyueWinter <mingyue_11129@qq.com>`）。
