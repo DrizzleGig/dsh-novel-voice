@@ -1,0 +1,93 @@
+{
+  "name": "dsh-novel-voice",
+  "version": "0.1.0",
+  "description": "导入你喜欢的小说与自己的旧稿，在本地提炼成可解释、可回滚的风格档案；写前编译 600 字简报，写后把 AI 味定位到句子，只改命中那一句。默认关闭，不打分，不训练模型。",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./icon": "./icon.svg",
+    "./client": "./client.js",
+    "./remote": "./lib/remote.js",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check index.js && node --check client.js && node --check lib/remote.js && node --check lib/remote-contract.js && node --check lib/tools.js && node scripts/check-surface.mjs",
+    "eval": "node scripts/eval-deslop.mjs"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "locale",
+    "docs",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "novel",
+    "novel-writing",
+    "style",
+    "voice",
+    "sidebar"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "author": "DrizzleGig",
+  "contributors": [
+    {
+      "name": "MiyueWinter",
+      "email": "mingyue_11129@qq.com",
+      "url": "https://github.com/MiyueWinter"
+    }
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/dsh-session": "*",
+    "@deepseek-ai/dsh-typert-protocol": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-session": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-typert-protocol": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrizzleGig/dsh-novel-voice.git"
+  },
+  "homepage": "https://github.com/DrizzleGig/dsh-novel-voice",
+  "bugs": {
+    "url": "https://github.com/DrizzleGig/dsh-novel-voice/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-ui-commands",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-sidebar-right"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

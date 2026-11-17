@@ -1,0 +1,4 @@
+node_modules/
+.dsh-novel-voice/
+*.log
+.tmp/

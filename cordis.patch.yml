@@ -1,0 +1,5 @@
+- insert:
+    - id: novel-voice
+      name: 'dsh-novel-voice'
+    - id: novel-voice-remote
+      name: 'dsh-novel-voice/remote'
