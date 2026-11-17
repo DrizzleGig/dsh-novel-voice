@@ -1,4 +1,4 @@
-﻿# `dsh-novel-voice` v0.1.0 · 发布检查
+# `dsh-novel-voice` v0.1.0 · 发布检查
 
 > 日期：2026-11-17
 > 包：`dsh-novel-voice@0.1.0`
@@ -66,3 +66,13 @@
 1. 打 tag `v0.1.0`（若进入 git）。
 2. 把 `docs/acceptance-douluo-2026-11-17.md` 与 `CHANGELOG.md` 一起归档。
 3. 下一版（0.2.0）首先补 G2–G4，再谈"去 AI 味"的对外承诺。
+
+## 8. 发布结果（2026-11-17）
+
+| 渠道 | 状态 |
+|---|---|
+| GitHub 仓库 | [DrizzleGig/dsh-novel-voice](https://github.com/DrizzleGig/dsh-novel-voice)：`main` + `v0.1.0` tag |
+| GitHub Release | [v0.1.0](https://github.com/DrizzleGig/dsh-novel-voice/releases/tag/v0.1.0) |
+| npm | 已提交 `dsh-novel-voice@0.1.0`；新包首版走 npm 的 staged publishing 审核，registry 暂为 `0.0.0-stage` 占位包，审核通过后 `0.1.0` 上线 |
+
+发布 commit：`release: v0.1.0 — 创作风格：导入作品学写法，写前简报，写后定点改 AI 味`（`Co-authored-by: MiyueWinter <mingyue_11129@qq.com>`）。
