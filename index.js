@@ -53,7 +53,7 @@ const SKILL = {
   ].join('\n'),
 }
 
-/** 舞台监督是否已安装（装了它就是总开关，本插件自己的开关降级为「独立模式」的偏好）。 */
+/** 故事总控是否已安装（装了它就是总开关，本插件自己的开关降级为「独立模式」的偏好）。 */
 function conductorInstalled(ctx) {
   try {
     const conductor = ctx.get?.('novelConductor')
@@ -229,7 +229,12 @@ export async function apply(ctx, config = {}) {
 
         if (action === 'status') {
           const on = await applyAgentMode(agent)
-          return { kind: 'success', text: `创作风格：${on ? '开' : '关'}（/voice on 开，/voice off 关）` }
+          const note = conductorInstalled(ctx)
+            ? (on
+              ? '\n故事总控：本会话开——本插件随总控生效，/voice on 的状态只作独立模式偏好。'
+              : '\n故事总控：本会话关——装了故事总控时它说了算，本插件不工作；要写就 /cue on。')
+            : ''
+          return { kind: 'success', text: `创作风格：${on ? '开' : '关'}（/voice on 开，/voice off 关）${note}` }
         }
         if (action !== 'on' && action !== 'off') {
           return { kind: 'error', text: '用法：/voice on | /voice off | /voice status' }
