@@ -1,4 +1,4 @@
-﻿window.__ModuleLoader__.load({
+window.__ModuleLoader__.load({
   id: 'dsh-novel-voice',
   factory(require) {
     const React = require('react')
@@ -49,6 +49,8 @@
         ['panel', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['brief', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['mirror', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['chapterText', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['verifyEvidence', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['saveWeights', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['setRuleStatus', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['addBan', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
@@ -480,13 +482,26 @@
     /* ════════════════════════════════════════════════════════════════════════
      * 3. Sheets
      * ════════════════════════════════════════════════════════════════════════ */
-    function EvidenceSheet({ snap, filter, onClose }) {
+    function EvidenceSheet({ snap, filter, onClose, remote, sessionId, onToast }) {
+      const [checks, setChecks] = React.useState({})
+      const [checking, setChecking] = React.useState(null)
       const profile = snap?.profile
       const rules = profile?.rules ?? []
       const selected = filter?.ruleId ? rules.find((rule) => rule.id === filter.ruleId) : null
       const workId = filter?.workId ?? null
       const work = (snap?.sources ?? []).find((source) => source.workId === workId)
       const list = selected ? [selected] : rules.filter((rule) => !workId || (rule.evidenceItems ?? []).some((item) => item.workId === workId))
+      const verify = async (key, item) => {
+        setChecking(key)
+        try {
+          const result = await remote.verifyEvidence(sessionId, { workId: item.workId, chapter: item.chapter, quote: item.quote, hash: item.hash }).then(unwrap)
+          setChecks((previous) => ({ ...previous, [key]: result }))
+        } catch (error) {
+          onToast(String(error?.message ?? error))
+        } finally {
+          setChecking(null)
+        }
+      }
       return h(Sheet, {
         kicker: work ? 'Evidence · 来源地图' : 'Evidence · 来源与证据',
         title: selected ? selected.title : work ? `《${work.title}》` : '来源与证据',
@@ -510,7 +525,18 @@
                 h('span', { style: { flex: 1 } }),
                 h(Mono, { style: { color: item.hash ? T.faint : T.mark } }, item.hash ? `hash ${String(item.hash).slice(0, 10)}` : '无 hash')),
               h('div', { style: { fontFamily: T.serif, fontSize: 11.3, lineHeight: 1.8, color: T.ink } }, `「${item.quote}」`),
-              h('div', { style: { fontSize: 9, color: T.muted, marginTop: 3 } }, item.workId ? '来自当前书架；点「回查」验证原文（0.2.0 后续接入）' : '旧证据没有 workId：无法定位，标未匹配，不补猜。'))
+              h('div', { style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 } },
+                h('div', { style: { flex: 1, fontSize: 9, color: T.muted, lineHeight: 1.6 } },
+                  item.workId
+                    ? (checks[`${rule.id}-${index}`]
+                      ? (checks[`${rule.id}-${index}`].found ? '已回查：原文命中' : `未找到原文${checks[`${rule.id}-${index}`].hashMatch === false ? '，hash 不一致' : '，标 stale'}`)
+                      : '来自当前书架；可回查原文')
+                    : '旧证据没有 workId：无法定位，标未匹配，不补猜。'),
+                item.workId ? h(Btn, {
+                  quiet: true, disabled: checking === `${rule.id}-${index}`,
+                  onClick: () => verify(`${rule.id}-${index}`, item),
+                  style: { fontSize: 9, color: checks[`${rule.id}-${index}`]?.found ? T.ok : T.accent },
+                }, checking === `${rule.id}-${index}` ? '回查中…' : '回查') : null))
           }))) : h(Empty, { icon: 'link', title: '还没有可回查的证据', lines: ['先从作品提取技法，或在规则上补证据；没有原文的规则不能显示“已确认”。'] }))
     }
 
@@ -560,11 +586,33 @@
       const [scene, setScene] = React.useState('悬疑对峙')
       const [result, setResult] = React.useState(null)
       const [busy, setBusy] = React.useState(false)
+      const works = snap?.works ?? []
+      const [workId, setWorkId] = React.useState(works[0]?.workId ?? '')
+      const [chapter, setChapter] = React.useState(1)
+      const [loadingChapter, setLoadingChapter] = React.useState(false)
+      const loadChapter = async () => {
+        if (!workId) { onToast('书架里还没有作品。'); return }
+        setLoadingChapter(true)
+        try {
+          const loaded = await remote.chapterText(sessionId, { workId, chapter }).then(unwrap)
+          setText(loaded?.text ?? '')
+          onToast(`已载入《${loaded?.title ?? workId}》第 ${chapter} 章`)
+        } catch (error) {
+          onToast(String(error?.message ?? error))
+        } finally {
+          setLoadingChapter(false)
+        }
+      }
       const run = async () => {
         if (!text.trim()) { onToast('先粘贴一段或选一章。'); return }
         setBusy(true)
         try {
-          const next = await remote.mirror(sessionId, { text, scene }).then(unwrap)
+          const payload = { text, scene }
+          if (result) {
+            payload.textHash = result.textHash
+            payload.profileRevision = result.profileRevision
+          }
+          const next = await remote.mirror(sessionId, payload).then(unwrap)
           setResult(next)
         } catch (error) {
           onToast(String(error?.message ?? error))
@@ -587,6 +635,16 @@
               borderRight: `1px solid ${T.line}`,
             },
           }, SCENE_LABEL[item] ?? item))),
+        works.length ? h('div', { style: { display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 } },
+          h('select', {
+            value: workId, onChange: (event) => setWorkId(event.target.value),
+            style: { flex: 1, minWidth: 0, border: `1px solid ${T.line}`, background: T.card, color: T.ink, fontFamily: T.sans, fontSize: 9.5, padding: '5px 6px', borderRadius: 2 },
+          }, works.map((work) => h('option', { key: work.workId, value: work.workId }, `《${work.title}》`))),
+          h('input', {
+            type: 'number', min: 1, value: chapter, onChange: (event) => setChapter(Math.max(1, Number(event.target.value) || 1)),
+            style: { width: 54, border: `1px solid ${T.line}`, background: T.card, color: T.ink, fontFamily: T.mono, fontSize: 9.5, padding: '5px 6px', borderRadius: 2 },
+          }),
+          h(Btn, { ghost: true, onClick: loadChapter, disabled: loadingChapter, style: { padding: '5px 8px', fontSize: 9.5 } }, loadingChapter ? '载入中…' : '选这一章')) : null,
         h('textarea', {
           value: text, onChange: (event) => setText(event.target.value),
           placeholder: '粘贴一段待检文本……',
@@ -895,7 +953,7 @@
           h('div', { style: { marginTop: 6, fontSize: 8.6, fontFamily: T.mono, color: T.faint, textAlign: 'center', letterSpacing: '.03em' } }, '写前 600 字 · 写后定位 · 只改命中那一句')),
         sheet ? (sheet.kind === 'brief' ? h(BriefSheet, { remote, sessionId, onClose: () => setSheet(null), onToast: setToast })
           : sheet.kind === 'mirror' ? h(MirrorSheet, { remote, sessionId, snap, onClose: () => setSheet(null), onToast: setToast })
-            : sheet.kind === 'evidence' ? h(EvidenceSheet, { snap, filter: sheet.filter, onClose: () => setSheet(null) })
+            : sheet.kind === 'evidence' ? h(EvidenceSheet, { snap, filter: sheet.filter, onClose: () => setSheet(null), remote, sessionId, onToast: setToast })
               : sheet.kind === 'timeline' ? h(TimelineSheet, { snap, onClose: () => setSheet(null) })
                 : h(ImportSheet, { onClose: () => setSheet(null), onFolder: importFolder, onFiles: importFiles, onPath: importPath, busy: Boolean(busy) })) : null,
         h(Toast, { text: toast }))
