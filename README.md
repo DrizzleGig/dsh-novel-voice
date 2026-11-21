@@ -4,6 +4,14 @@
 [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/DrizzleGig/dsh-novel-voice/blob/main/LICENSE)
 [![stars](https://img.shields.io/github/stars/DrizzleGig/dsh-novel-voice)](https://github.com/DrizzleGig/dsh-novel-voice/stargazers)
 
+## 本版本（v0.2.1，2026-11-21）
+
+- **装了故事总控时，开关由它决定**：总控关着 → `voice_*` 不可用（哪怕 `/voice on` 过）；总控开着 → 可用（哪怕没 `/voice on`）。没装故事总控时，照旧按 `/voice on|off`。
+- 接管时会撤掉关闭时装的 deny restrict，收回时按独立开关恢复；只改内存。
+- `/voice status` 会直接说「本会话开 / 关，/cue on 才对」。
+- 工具参数 schema 守卫进 `npm test`。
+
+
 ## 把你喜欢的小说，变成 AI 写作的风格。
 
 喜欢某部小说的叙事方式，想让 AI 写出相近的故事氛围？或者已经有自己的原创作品，希望 AI 延续并发展其中的独特文风？

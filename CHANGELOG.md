@@ -1,3 +1,11 @@
+## 0.2.1 — 2026-11-21
+
+- 接管：`applyAgentMode` 改用 `effectiveOn`，订阅 `novel-conductor/drive` 重算本会话（含 deny restrict 的收放）。
+- `/voice status` 增故事总控说明。
+- 新增 `lib/tool-schema.mjs` + `test/tool-schema.test.mjs`（参数 schema 守卫）。
+
+
+
 ﻿# Changelog
 
 ## 0.2.0 — 2026-11-21（已发布；G2/G3 作者验收待补）
