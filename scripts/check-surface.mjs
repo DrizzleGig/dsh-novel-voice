@@ -21,6 +21,7 @@ const REQUIRED = [
   'lib/store.js',
   'lib/compiler.js',
   'lib/check.js',
+  'lib/mirror.js',
   'lib/repair.js',
 ]
 for (const file of REQUIRED) {
@@ -29,7 +30,7 @@ for (const file of REQUIRED) {
 
 const pkg = JSON.parse(await read('package.json'))
 assert.equal(pkg.name, 'dsh-novel-voice')
-assert.equal(pkg.version, '0.1.0')
+assert.equal(pkg.version, '0.2.0')
 assert.equal(pkg.type, 'module')
 assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
 assert.ok(pkg.dsh.client.inject.includes('@deepseek-ai/dsh-client-ui-sidebar-right'))
@@ -45,7 +46,7 @@ assert.ok(client.includes('风格工作室'))
 assert.ok(client.includes("id: 'dsh-novel-voice'"))
 assert.ok(client.includes('sidebar.right.pane.tab'))
 assert.ok(client.includes('conversation.session.header.utilities'))
-assert.doesNotMatch(client, /文笔分|相似度|AI 味 \d+ 分/)
+assert.doesNotMatch(client, /(?:文笔分|AI\s*味|相似度)\s*[:：]?\s*\d/)
 
 const { toolDefinitions } = await import('../lib/tools.js')
 const tools = toolDefinitions()
@@ -74,3 +75,4 @@ assert.ok(index.includes('novel-voice'))
 
 console.log('check-surface: ok')
 console.log(`  files ${REQUIRED.length}, tools ${tools.length}, remote ${DESCRIPTORS.length}`)
+

@@ -1,9 +1,9 @@
-﻿// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
+// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
 // 独立运行：不 import beat / fade / fanfic，不读它们的运行时。
 
-import { VERSION, PLUGIN_NAME } from './lib/consts.js'
+import { VERSION, PLUGIN_NAME, ROOT_DIR } from './lib/consts.js'
 import { toolDefinitions } from './lib/tools.js'
-import { getSessionMode, setSessionMode } from './lib/store.js'
+import { getSessionMode, setSessionMode, readLibrary, readState, subscribeChanges } from './lib/store.js'
 import { createLlm } from './lib/llm.js'
 import { briefForProfile } from './lib/compiler.js'
 import { listProfiles, loadProfile, summaryOf } from './lib/profile.js'
@@ -63,22 +63,78 @@ function sessionKey(context) {
 
 const TOOL_NAMES = toolDefinitions().map((definition) => definition.name)
 
+function serviceRoot(args = {}) {
+  const root = args.cwd ?? args.dir
+  if (typeof root !== 'string' || !root.trim()) {
+    throw new Error('cwd 必须是工作区根目录的绝对路径')
+  }
+  return root
+}
+
 function buildService(ctx) {
   return {
-    identity: { name: '创作风格', panel: '风格工作室', version: VERSION, package: PLUGIN_NAME },
-    getStatus: async ({ dir, book }) => {
-      const profiles = await listProfiles(dir, book)
-      return { ok: true, profiles, contract: await loadContract(dir) }
+    identity() {
+      return {
+        plugin: PLUGIN_NAME,
+        version: VERSION,
+        service_version: 1,
+        capabilities: ['voice.brief', 'voice.status', 'voice.revision'],
+        dir: ROOT_DIR,
+        readOnly: true,
+      }
     },
-    getBrief: async ({ dir, book, chapter, scene, cast, task, budget, sampleBudget }) => {
-      return await briefForProfile(dir, book, { chapter, scene, cast, task, budget, sampleBudget })
+
+    async getStatus({ cwd, dir, book } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const library = await readLibrary(root, book)
+      const profiles = await listProfiles(root, book)
+      const profile = profiles.length ? await loadProfile(root, book, null) : null
+      const state = await readState(root, book)
+      const contract = await loadContract(root)
+      return {
+        book: book ?? null,
+        works: library.works.length,
+        profiles,
+        profile: profile ? summaryOf(profile) : null,
+        revision: state.revision,
+        updatedAt: state.updatedAt,
+        contract: { available: Boolean(contract.available), project: contract.project ?? null, count: (contract.forbidden ?? []).length },
+      }
     },
-    getRules: async ({ dir, book, profileId }) => {
-      const profile = await loadProfile(dir, book, profileId ?? null)
+
+    async getRevision({ cwd, dir, book } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const state = await readState(root, book)
+      return { revision: state.revision, updatedAt: state.updatedAt, revisionDrift: false }
+    },
+
+    async getBrief({ cwd, dir, book, chapter, scene, cast, task, budget, sampleBudget, profileId } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const result = await briefForProfile(root, book, {
+        chapter, scene, cast, task, budget, sampleBudget, profileId,
+      })
+      if (result?.ok === false) return result
+      const state = await readState(root, book)
+      return {
+        ...result,
+        tokens: result.tokensEstimate,
+        revision: state.revision,
+        generated_at: new Date().toISOString(),
+      }
+    },
+
+    async getRules({ cwd, dir, book, profileId } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const profile = await loadProfile(root, book, profileId ?? null)
       return { ok: Boolean(profile), profile: profile ? summaryOf(profile) : null, rules: profile?.rules ?? [] }
     },
-    getWatchlist: async ({ dir, book }) => readWatchlist(dir, book),
-    onDidChange: () => () => {},
+
+    async getWatchlist({ cwd, dir, book } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      return readWatchlist(root, book)
+    },
+
+    onDidChange: subscribeChanges,
   }
 }
 

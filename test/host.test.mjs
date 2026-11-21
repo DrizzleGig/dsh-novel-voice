@@ -130,7 +130,8 @@ test('档案：版本快照可回滚，回滚不删反馈', async () => {
   await confirmProfile(dir, 'book', profile.id)
 
   const rolled = await rollbackProfile(dir, 'book', profile.id)
-  assert.notEqual(rolled.version, '1.2')
+  assert.equal(rolled.version, '1.2')
+  assert.equal(rolled.restoredFrom, profile.revision)
   assert.ok(Array.isArray(rolled.rules))
 })
 

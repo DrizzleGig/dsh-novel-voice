@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.2.0 — 2026-11-21（开发版，G2–G4 待验收）
+
+**主题：看得见的风格**——来源可追、对照可验、版本可回看。本版不新增文风算法，重点是把已有档案变成可核对的工作台。
+
+### 新增
+
+- **来源地图**：规则证据保留 `workId / chapter / quote / hash`；面板新增「来源与证据」与证据 sheet，按作品显示证据条数（条形按证据条数，不冒充作者权重）。旧证据没有 `workId` 时标「未匹配」，不补猜。
+- **对照镜**：只读对照档案的六项 L2 区间（句长、句长变化、段长、对话比、抽象词、解释连接词）与四类命中；不调用 `rank()`，返回结构**没有 score/total/percent**；每条 finding 必须能追到规则，找不到标「未匹配」；绑定 `textHash + profileRevision`，过期标 stale。
+- **档案时间线**：`state.json` 单调 revision；档案补 `revision/parentRevision/action/reason/at/restoredFrom`；面板可看版本、变更与回滚来源；回滚建新 revision，不再重号。
+- **排字房 UI**：420px 右栏重做——暖纸/墨字/衬线标题/细线；书架 / 档案 / 学习三 tab；简报、证据、时间线、对照镜、导入五个 sheet；深浅色跟随宿主；去掉旧的图表式仪表盘。
+- **服务契约**：`identity()` 可调用并声明 `voice.brief/status/revision`；`getStatus/getRevision/getBrief` 统一 `cwd`（兼容旧 `dir`）；`getBrief` 补 `revision/generated_at/tokens`；`voice_check` 补 `status/pass/revision`；`onDidChange` 接真实变更事件。
+
+### 修正
+
+- **voice → fanfic 断链**：先读 `.dsh-novel-fanfic/<project>/project.json`，再兼容旧的 `book.json`；显式 project 不存在时返回 `no-project`，不串书。
+- **回滚重号**：从 v1.0 回滚不再写回 v1.1；用当前版本 +1 建新版本，`restoredFrom` 指向被恢复的 revision。
+- **面板证据丢 `workId`**：`remote.js` 的证据透传补齐 `workId/chapter/hash`。
+
+### 兼容
+
+- `profile.json` 仍 `schemaVersion:1`；新增字段全部可选。
+- 旧档案无 revision → 读时按 `audit.jsonl` 行数兜底，显示「未知」；第一次写盘后从当前数起算。
+- 旧规则里的 `supporting_evidence` 读时映射为 legacy 证据，不批量写回。
+- 七个工具名、`/voice` 开关、右栏 tab kind、数据目录、服务 key 不变。
+
+### 测试
+
+- `node --test`：58 → **62**（服务契约、fanfic 断链、revision/历史/回滚、对照镜无评分/stale）。
+- `npm run check`：7 工具 / 18 remote（新增 `mirror`）。
+
+### 已知限制（发布阻断）
+
+- **G2 召回、G3 盲选、G4 零编造尚未跑**；0.2.0 只是开发版，不对外宣称「可核对」。发布前必须按方案 §9 完成三条真实验收。
+- 证据 hash 的「回查原文」目前只展示 hash；面板内的自动回查留到 0.2.1。
+- 完整导入向导、学习批处理、≥520px 两列留到 0.2.1。
+
 ## 0.1.0 — 2026-11-17
 
 首个可安装版本：**创作风格 / 风格工作室**。默认关闭，`/voice on` 启用。

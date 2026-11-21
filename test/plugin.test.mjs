@@ -41,7 +41,9 @@ test('插件：默认关闭，/voice on 之后工具才可见，/voice off 又�
   assert.equal(commands[0].name, 'voice')
   assert.equal(skills.length, 1)
   assert.ok(provided.includes('novelVoice'))
-  assert.ok(ctx.novelVoice?.identity?.name === '创作风格')
+  assert.equal(typeof ctx.novelVoice?.identity, 'function')
+  assert.equal(ctx.novelVoice.identity().plugin, 'dsh-novel-voice')
+  assert.ok(ctx.novelVoice.identity().capabilities.includes('voice.brief'))
 
   const agent = { id: 'agent-1' }
   const visible = () => registered.every(({ options }) => options.when({ agent }) === true)
