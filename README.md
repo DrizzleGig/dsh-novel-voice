@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/DrizzleGig/dsh-novel-voice/blob/main/LICENSE)
 [![stars](https://img.shields.io/github/stars/DrizzleGig/dsh-novel-voice)](https://github.com/DrizzleGig/dsh-novel-voice/stargazers)
 
-## 本版本（v0.2.1，2026-11-21）
+## 本版本（v0.2.2，2026-11-21）
 
 - **装了故事总控时，开关由它决定**：总控关着 → `voice_*` 不可用（哪怕 `/voice on` 过）；总控开着 → 可用（哪怕没 `/voice on`）。没装故事总控时，照旧按 `/voice on|off`。
 - 接管时会撤掉关闭时装的 deny restrict，收回时按独立开关恢复；只改内存。

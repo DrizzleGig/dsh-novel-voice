@@ -1,4 +1,4 @@
-## 0.2.1 — 2026-11-21
+## 0.2.2 — 2026-11-21
 
 - 接管：`applyAgentMode` 改用 `effectiveOn`，订阅 `novel-conductor/drive` 重算本会话（含 deny restrict 的收放）。
 - `/voice status` 增故事总控说明。
