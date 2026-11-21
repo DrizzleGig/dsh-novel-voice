@@ -1,4 +1,4 @@
-﻿# 创作风格 · DSH Novel Voice
+# 创作风格 · DSH Novel Voice
 
 [![npm version](https://img.shields.io/npm/v/dsh-novel-voice)](https://www.npmjs.com/package/dsh-novel-voice)
 [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/DrizzleGig/dsh-novel-voice/blob/main/LICENSE)
@@ -15,6 +15,8 @@
 喜欢什么样的小说，就从什么样的作品开始；想形成什么样的文风，就把它一点点变成自己的风格。
 
 **默认关闭** · **不写正文** · **不打分** · **不训练模型**
+
+**0.2.0 已发布（2026-11-21）**：排字房工作台（来源地图 / 只读对照镜 / 档案时间线 / 420px UI）。G1 与斗罗同人 12 章章节验收已过；G2 正式作者标注、G3 盲选、G4 真实模型 `fix:true` 仍待补，不宣称全部验收通过。
 
 ```text
 导入作品 → 本地统计 → 建风格档案 → 写前编译简报 → 写 → 检查 → 定点改写 → 反馈记账
@@ -143,7 +145,7 @@ dsh plugin --profile web add github:DrizzleGig/dsh-novel-voice
 
 ### Q6：目前有哪些限制？
 
-- 召回 / 盲选 / 零编造的真实验收（G2–G4）仍是 v0.2.0 的发布门槛；当前开发版只完成人工误报（G1），不要对外宣称「可核对」；
+- 召回 / 盲选 / 零编造的真实验收：G1（人工误报）与斗罗同人 12 章章节验收已过；**G2 正式作者标注、G3 盲选、G4 真实模型 `fix:true` 仍未完成**，不要对外宣称「全部验收通过」；
 - 不做文笔评分、作家相似度、模型训练；对照镜不返回 score/total/percent；
 - 面板不直接改稿，检查与改写走 `voice_check` / `voice_polish`；
 - 浏览器上传单文件 ≤6 MB，更大的整本用「选文件夹」；
