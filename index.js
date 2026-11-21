@@ -1,4 +1,4 @@
-// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
+﻿// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
 // 独立运行：不 import beat / fade / fanfic，不读它们的运行时。
 
 import { VERSION, PLUGIN_NAME, ROOT_DIR } from './lib/consts.js'
@@ -53,6 +53,16 @@ const SKILL = {
   ].join('\n'),
 }
 
+/** 舞台监督接管：conductor 开着时，本会话也能用本插件（不改自己的开关与账本）。 */
+function conductorDriving(ctx, key) {
+  if (!key) return false
+  try {
+    const conductor = ctx.get?.('novelConductor')
+    return conductor?.isDriving?.(key) === true
+  } catch {
+    return false
+  }
+}
 function sessionKey(context) {
   return context?.agent?.id
     ?? context?.session?.agent?.id
@@ -186,7 +196,7 @@ export async function apply(ctx, config = {}) {
 
   for (const definition of toolDefinitions(deps)) {
     ctx.effect(() => ctx.tools.register(definition, {
-      when: (context) => modeCache.get(sessionKey(context)) === true,
+      when: (context) => modeCache.get(sessionKey(context)) === true || conductorDriving(ctx, sessionKey(context)),
     }))
   }
 
