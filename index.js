@@ -168,6 +168,7 @@ export async function apply(ctx, config = {}) {
   const agents = ctx.get('agents')
   const modeCache = new Map()
   const restrictions = new Map()
+  const agentsById = new Map()
 
   const dirFor = async (agent) => {
     if (!workingDirectory?.ensure) return null
@@ -183,8 +184,11 @@ export async function apply(ctx, config = {}) {
     const dir = await dirFor(agent)
     if (!dir) return false
     const { mode } = await getSessionMode(dir, agent.id)
-    const on = effectiveOn(ctx, mode === 'on', agent.id)
-    modeCache.set(agent.id, on)
+    const manual = mode === 'on'
+    const on = effectiveOn(ctx, manual, agent.id)
+    // 缓存只存独立状态：总控装/卸时同一份缓存要能被重新解释。
+    modeCache.set(agent.id, manual)
+    agentsById.set(agent.id, agent)
 
     const previous = restrictions.get(agent.id)
     if (previous) {
@@ -270,8 +274,9 @@ export async function apply(ctx, config = {}) {
     ctx.effect(() => ctx.on('agent/created', async ({ agent }) => {
       await applyAgentMode(agent)
     }))
-    ctx.effect(() => ctx.on('novel-conductor/drive', async ({ agent }) => {
-      if (agent?.id) await applyAgentMode(agent)
+    ctx.effect(() => ctx.on('novel-conductor/drive', async ({ sessionId, agent }) => {
+      const target = agent ?? agentsById.get(sessionId)
+      if (target?.id) await applyAgentMode(target)
     }))
     ctx.effect(() => ctx.on('agent/disposed', ({ agent }) => {
       modeCache.delete(agent?.id)
