@@ -1,4 +1,4 @@
-# 创作风格 · DSH Novel Voice
+﻿# 创作风格 · DSH Novel Voice
 
 [![npm version](https://img.shields.io/npm/v/dsh-novel-voice)](https://www.npmjs.com/package/dsh-novel-voice)
 [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/DrizzleGig/dsh-novel-voice/blob/main/LICENSE)
@@ -151,7 +151,7 @@ dsh plugin --profile web add github:DrizzleGig/dsh-novel-voice
 
 ## 测试与验证
 
-- `npm test`：**62/62** 通过；`npm run check` 检查 7 工具 / 20 remote（含 `mirror` / `chapterText` / `verifyEvidence`）、命名与契约同步。
+- `npm test`：**63/63** 通过；`npm run check` 检查 7 工具 / 20 remote（含 `mirror` / `chapterText` / `verifyEvidence`）、命名与契约同步。
 - 真实语料（《斗罗大陆》原著 24 章 / 96,463 字）：人工正文误报 **0.10 处/千字**。
 - 正控（故意写满 AI 味）：11.7 处/千字；12 章 AI 同人初稿只有 0.04 处/千字——不是检测器失灵，而是这批稿子的 AI 感在节奏层（句长 15 vs 原著 31、段长 25 vs 66），已由 L2 节奏规则覆盖。
 
@@ -159,6 +159,7 @@ dsh plugin --profile web add github:DrizzleGig/dsh-novel-voice
 
 - [v0.1.0 开发方案（机制、尽调、验收）](docs/design-v0.1.0.md)
 - [v0.2.0 只读服务契约](docs/contract.md)
+- [v0.2.0 章节验收（斗罗同人，2026-11-21）](docs/acceptance-douluo-2026-11-21.md)
 - [v0.1.0 发布检查](docs/release-checklist-v0.1.0.md)
 - [模拟验收：斗罗大陆（2026-11-17）](docs/acceptance-douluo-2026-11-17.md)
 - [更新记录](CHANGELOG.md)
@@ -178,4 +179,6 @@ MIT License，见 [LICENSE](LICENSE)。
 ---
 
 喜欢什么样的小说，就从什么样的作品开始。
+
+
 

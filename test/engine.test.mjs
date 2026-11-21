@@ -34,6 +34,13 @@ test('抽象情绪直述会被指出，并给出可执行的替换建议', () =>
   assert.match(found.fix, /动作|生理|删掉/)
 })
 
+test('感官不是情绪：一股说不出的味道不报 emotion-naming，恐惧仍然报', () => {
+  const sensory = lint('他闻到了一股说不出的味道，像铁锈。', { watchlist })
+  assert.equal(sensory.findings.some((finding) => finding.detector === 'emotion-naming'), false)
+  const emotion = lint('他忽然感到一股莫名的恐惧。', { watchlist })
+  assert.equal(emotion.findings.some((finding) => finding.detector === 'emotion-naming'), true)
+})
+
 test('套话按段报，不逐词报', () => {
   const text = '他眼中闪过一丝犹豫，嘴角勾起一抹弧度。\n\n她站在门口，没有动。'
   const result = lint(text, { watchlist })
