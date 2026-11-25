@@ -23,6 +23,20 @@ const REQUIRED = [
   'lib/check.js',
   'lib/mirror.js',
   'lib/repair.js',
+  'lib/ratings.js',
+  'lib/personas.js',
+  'lib/fingerprint.js',
+  'lib/rules/engine.js',
+  'lib/rules/index.js',
+  'lib/rules/packs/zh-slop-core.json',
+  'lib/rules/packs/zh-fiction.json',
+  'lib/rules/packs/zh-narrative.json',
+  'lib/rules/packs/zh-punctuation.json',
+  'lib/vendor/humanizer-lint/zh-slop.json',
+  'THIRD_PARTY_NOTICES.md',
+  'LICENSES/README.md',
+  'LICENSES/humanizer-lint/LICENSE',
+  'vendor/manifest.json',
 ]
 for (const file of REQUIRED) {
   await fs.access(path.join(root, file))
@@ -30,7 +44,7 @@ for (const file of REQUIRED) {
 
 const pkg = JSON.parse(await read('package.json'))
 assert.equal(pkg.name, 'dsh-novel-voice')
-assert.equal(pkg.version, '0.2.0')
+assert.match(pkg.version, /^\d+\.\d+\.\d+$/)
 assert.equal(pkg.type, 'module')
 assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
 assert.ok(pkg.dsh.client.inject.includes('@deepseek-ai/dsh-client-ui-sidebar-right'))
@@ -47,12 +61,15 @@ assert.ok(client.includes("id: 'dsh-novel-voice'"))
 assert.ok(client.includes('sidebar.right.pane.tab'))
 assert.ok(client.includes('conversation.session.header.utilities'))
 assert.doesNotMatch(client, /(?:文笔分|AI\s*味|相似度)\s*[:：]?\s*\d/)
+assert.ok(client.includes("role: 'dialog'"), 'sheet 缺 dialog 语义')
+assert.ok(client.includes("event.key === 'Escape'"), 'sheet 缺 Escape 关闭')
+assert.ok(client.includes("event.key !== 'Tab'"), 'sheet 缺 Tab 环绕')
 
 const { toolDefinitions } = await import('../lib/tools.js')
 const tools = toolDefinitions()
-assert.equal(tools.length, 7)
+assert.equal(tools.length, 9)
 assert.deepEqual(tools.map((tool) => tool.name), [
-  'voice_import', 'voice_learn', 'voice_profile', 'voice_brief', 'voice_check', 'voice_polish', 'voice_feedback',
+  'voice_import', 'voice_learn', 'voice_profile', 'voice_brief', 'voice_check', 'voice_polish', 'voice_feedback', 'voice_rating', 'voice_persona',
 ])
 for (const tool of tools) {
   assert.ok(tool.description.length >= 30, `${tool.name} 描述太短`)

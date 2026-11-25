@@ -1,0 +1,186 @@
+{
+  "id": "zh-fiction",
+  "title": "中文小说 AI 腔（qu-ai-wei / sepia 派生）",
+  "version": "0.1.0",
+  "license": "MIT",
+  "source": {
+    "project": "qu-ai-wei + sepia",
+    "version": "2026-11",
+    "url": "https://github.com/LifelongLazyLearner/qu-ai-wei",
+    "license": "MIT",
+    "note": "只取症状分类与检查思路；规则、文案为本项目重写，默认关。"
+  },
+  "defaultEnabled": false,
+  "rules": [
+    {
+      "id": "XF001",
+      "type": "STOCK_ACTION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "眼中闪过一丝" },
+      "message": "眼神套话：用“闪过一丝”代替具体反应",
+      "fix": "写清他看到/听到了什么、手上做了什么，或直接删掉这句。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF002",
+      "type": "STOCK_ACTION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "嘴角勾起一抹" },
+      "message": "嘴角套话：笑被写成固定动作",
+      "fix": "换成这个人此刻真正会做的一个动作，或让对话承担态度。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF003",
+      "type": "EMOTION_LABEL",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "心中五味杂陈" },
+      "message": "情绪直述：用成语代替具体感受",
+      "fix": "写身体反应、迟疑的动作或一句没说出口的话。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF004",
+      "type": "ATMOSPHERE_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "空气中弥漫着" },
+      "message": "环境套话：气氛被直接命名",
+      "fix": "写一个可感知的来源（声音、气味、温度、物件），不要总结气氛。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF005",
+      "type": "PERSONIFICATION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "仿佛在诉说着" },
+      "message": "拟人解释：物件替作者讲主题",
+      "fix": "删掉解释，保留物件本身；让读者自己看出来。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF006",
+      "type": "TURN_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "这一刻[，,]\\s*[他她它]", "flags": "u" },
+      "message": "转折套式：用“这一刻”替事件做标记",
+      "fix": "直接写发生在这一秒的动作或对话，删掉“这一刻”。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF007",
+      "type": "CLOSING_ELEVATION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "从此[，,]\\s*(?:一切|所有|他|她|他们)", "flags": "u" },
+      "message": "段末升华：用“从此”把局部事件推到总结",
+      "fix": "收在一个具体动作、物件或没说完的话上；不要替读者总结。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF008",
+      "type": "FORESHADOW_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "他(?:知道|明白|意识到)[，,][^。！？]{0,30}(?:再|已经|从此)", "flags": "u" },
+      "message": "预知式总结：人物替叙述者下结论",
+      "fix": "把“他知道”换成他看见/做了什么；结论留给读者。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF009",
+      "type": "WEAKENED_ACTION",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "phrase", "pattern": "不由得" },
+      "message": "弱化动作：动作被“不由得”抹掉主动性",
+      "fix": "能删就删；要保留主动性就写他实际做了什么。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF010",
+      "type": "ADVERB_STACK",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:缓缓|微微|淡淡|轻轻|悄悄|静静)地", "flags": "u" },
+      "message": "副词套话：用“X 地”代替具体节奏",
+      "fix": "删掉副词，或用一个更准的动作/停顿替代。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF011",
+      "type": "ABSTRACT_AVOIDANCE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:说不清|难以言喻|无法形容|难以名状)", "flags": "u" },
+      "message": "抽象回避：用“说不出”跳过具体描写",
+      "fix": "写出一个具体的身体感受、动作或画面；不必解释全部。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF012",
+      "type": "STOCK_EXPRESSION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "意味深长" },
+      "message": "表情套话：用“意味深长”代替可观察的反应",
+      "fix": "写他具体看了哪里、停了多久、说了什么。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF013",
+      "type": "STOCK_EXPRESSION",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "phrase", "pattern": "若有所思" },
+      "message": "表情套话：用“若有所思”代替思考的具体内容",
+      "fix": "写他想到的那件事、手里的动作，或直接进入下一句。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF014",
+      "type": "INFLATION",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "phrase", "pattern": "前所未有" },
+      "message": "拔高：普通事件被写成空前",
+      "fix": "删掉拔高，写清这次和上次的具体差别。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF015",
+      "type": "ADVERB_STACK",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:无声地|静静地|默默地)", "flags": "u" },
+      "message": "副词套话：静默被写成固定修饰",
+      "fix": "删掉修饰，写一个能听见/看见的细节。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XF016",
+      "type": "NOT_X_BUT_Y",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "不是[^。！？]{1,30}[，,]?而是", "flags": "u" },
+      "message": "否定-修正句：先否定再抬高",
+      "fix": "直接说后半句的主张；只有否定半边在纠正读者认知时才保留。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XF017",
+      "type": "EMOTION_LABEL",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "[他她](?:感到|觉得|心中|心里)[^。！？]{0,12}(?:一阵|无比|十分|异常|莫名)", "flags": "u" },
+      "message": "情绪直述：用“感到/心中”总结情绪",
+      "fix": "写触发情绪的动作或身体反应，不写“感到”。",
+      "evidenceLevel": "indirect"
+    }
+  ]
+}

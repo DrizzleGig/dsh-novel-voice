@@ -1,0 +1,66 @@
+{
+  "id": "zh-punctuation",
+  "title": "中文标点规范化提示（zhlint/pangu 思路）",
+  "version": "0.1.0",
+  "license": "MIT",
+  "source": {
+    "project": "zhlint / pangu 思路",
+    "version": "2026-11",
+    "url": "https://github.com/zhlint-project/zhlint",
+    "license": "MIT",
+    "note": "只做标点提示，不改正文；默认关。"
+  },
+  "defaultEnabled": false,
+  "rules": [
+    {
+      "id": "XP001",
+      "type": "PUNCT_STYLE",
+      "scope": "all",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "\\.\\.\\.", "flags": "u" },
+      "message": "中文省略号写成三个半角点",
+      "fix": "中文正文用「……」；代码/URL/引文里的原样保留。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XP002",
+      "type": "PUNCT_STYLE",
+      "scope": "all",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?<!—)—(?!—)", "flags": "u" },
+      "message": "单个半角/单字破折号",
+      "fix": "中文正文用「——」；引文和代码里的原样保留。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XP003",
+      "type": "PUNCT_STYLE",
+      "scope": "all",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "\\([^()\\n]*[\\u4e00-\\u9fff][^()\\n]*\\)", "flags": "u" },
+      "message": "中文内容用了半角括号",
+      "fix": "改成全角「（）」；数字、代码、URL 里的括号保留。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XP004",
+      "type": "PUNCT_STYLE",
+      "scope": "all",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "\"[^\"\\n]*[\\u4e00-\\u9fff][^\"\\n]*\"", "flags": "u" },
+      "message": "中文引文用了半角双引号",
+      "fix": "改成「」；对白和引文里的原样保留。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XP005",
+      "type": "PUNCT_STYLE",
+      "scope": "all",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?<!…)…(?!…)", "flags": "u" },
+      "message": "单个省略号点",
+      "fix": "中文正文用「……」；引文和代码里的原样保留。",
+      "evidenceLevel": "direct"
+    }
+  ]
+}

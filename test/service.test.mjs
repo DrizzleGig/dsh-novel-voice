@@ -68,6 +68,8 @@ test('服务：identity 是函数，cwd 与 dir 都能读，revision/brief 字�
   assert.equal(identity.plugin, 'dsh-novel-voice')
   assert.equal(identity.service_version, 1)
   assert.ok(identity.capabilities.includes('voice.brief'))
+  assert.ok(identity.capabilities.includes('voice.readerSignals'))
+  assert.ok(identity.capabilities.includes('voice.personaBrief'))
   assert.equal(identity.readOnly, true)
 
   const byCwd = await service.getRevision({ cwd: dir, book: 'book' })
@@ -84,6 +86,18 @@ test('服务：identity 是函数，cwd 与 dir 都能读，revision/brief 字�
   assert.equal(brief.revision, byCwd.revision)
   assert.equal(typeof brief.generated_at, 'string')
   assert.equal(typeof brief.tokens, 'number')
+
+  const signals = await service.getReaderSignals({ cwd: dir, book: 'book' })
+  assert.equal(signals.ok, true)
+  assert.equal(signals.available, false)
+  assert.equal(signals.enabled, false)
+  assert.equal(signals.reason, 'reader-off')
+  assert.equal(signals.scope, 'book')
+
+  const persona = await service.getPersonaBrief({ cwd: dir, book: 'book' })
+  assert.equal(persona.ok, true)
+  assert.equal(persona.available, false)
+  assert.equal(persona.reason, 'no-confirmed')
 })
 
 test('协作：voice → fanfic 读 project.json，旧 book.json 仍兼容，显式 project 不串书', async () => {

@@ -1,0 +1,136 @@
+{
+  "id": "zh-narrative",
+  "title": "中文小说叙事结构提示（sepia 派生）",
+  "version": "0.1.0",
+  "license": "MIT",
+  "source": {
+    "project": "sepia",
+    "version": "2026-11",
+    "url": "https://github.com/Nanako0129/sepia",
+    "license": "MIT",
+    "note": "只取叙事检查思路；规则与文案为本项目重写，默认关。"
+  },
+  "defaultEnabled": false,
+  "rules": [
+    {
+      "id": "XN001",
+      "type": "CLOSING_SUMMARY",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:就这样|从此|这一切|他知道|她明白|也许这就是|或许这就是)", "flags": "u" },
+      "message": "段末/段中总结：替读者把事件收成结论",
+      "fix": "收在动作、物件或一句没说完的话上；把“这说明”留给读者。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN002",
+      "type": "THEME_EXPLAIN",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:这说明|这意味着|仿佛在告诉|似乎在诉说|像是在提醒)", "flags": "u" },
+      "message": "主题解释：叙述者直接说明意义",
+      "fix": "删掉解释句，保留让读者自己看出意义的事件或画面。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XN003",
+      "type": "OMNISCIENT_FORESHADOW",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "[他她]不知道的是", "flags": "u" },
+      "message": "全知预告：用“他不知道的是”制造悬念",
+      "fix": "先写正在发生的事；要留悬念就停在具体动作上，不替读者预告。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN004",
+      "type": "ABSTRACT_EMOTION",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:感到|心中|心里)[^。！？]{0,12}(?:复杂|难以|说不清|无法形容|五味杂陈)", "flags": "u" },
+      "message": "抽象情绪：用“复杂/难以”概括感受",
+      "fix": "写触发情绪的动作、身体反应或一句具体的话。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN005",
+      "type": "CONNECTIVE_CHAIN",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:然而|因此|所以|于是|此外|同时)[^。！？]{0,12}[，,](?:然而|因此|所以|于是|此外|同时)", "flags": "u" },
+      "message": "连接词链：一句话里连续用两个转折/因果连接",
+      "fix": "删掉一个连接词，或把因果拆成两个具体动作。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN006",
+      "type": "EXPLANATORY_SIMILE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:仿佛|好像|似乎)[^。！？]{0,20}(?:在诉说|在提醒|在告诉|在等待|在倾听)", "flags": "u" },
+      "message": "解释性比喻：物件替作者讲主题",
+      "fix": "保留物件本身，删掉“仿佛在诉说”的解释。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XN007",
+      "type": "EMOTION_ADJECTIVE_STACK",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:无尽|深深|浓浓|淡淡|莫名)的", "flags": "u" },
+      "message": "情绪形容词：用形容词代替可观察的细节",
+      "fix": "删掉形容词，写一个能看见/听见的动作。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN008",
+      "type": "EVERYTHING_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:一切都|一切又|一切终将|故事才刚刚开始)", "flags": "u" },
+      "message": "收束套话：用“一切”把局部事件推到全景",
+      "fix": "停在具体人物和具体后果上；不要用“一切”收尾。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XN009",
+      "type": "DIALOGUE_THEME",
+      "scope": "dialogue",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:这就是|这才是)[^。！？]{0,20}(?:意义|答案|宿命|命运)", "flags": "u" },
+      "message": "对白讲主题：人物替作者说中心思想",
+      "fix": "让人物谈具体要的东西或眼前的冲突，把主题留给事件。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN010",
+      "type": "TIME_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:时光荏苒|岁月如梭|光阴似箭|日月如梭)", "flags": "u" },
+      "message": "时间套话：用成语跳过时间推进",
+      "fix": "写一个具体变化（季节、物件、身体、关系）来推进时间。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "XN011",
+      "type": "MORAL_CLOSER",
+      "scope": "narration",
+      "severity": "warn",
+      "match": { "kind": "regex", "pattern": "(?:原来|终于明白|这才懂得)[^。！？]{0,24}(?:道理|意义|珍贵|重要)", "flags": "u" },
+      "message": "道德收尾：人物在结尾“明白了道理”",
+      "fix": "让改变体现在下一个动作或选择里，不写领悟总结。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "XN012",
+      "type": "SUSPENSE_TEASE",
+      "scope": "narration",
+      "severity": "info",
+      "match": { "kind": "regex", "pattern": "(?:他|她)还不知道[^。！？]{0,20}(?:将|会|等待)", "flags": "u" },
+      "message": "悬念预告：用“还不知道将会”吊读者",
+      "fix": "把镜头停在正在发生的动作上；不要预告尚未发生的事。",
+      "evidenceLevel": "indirect"
+    }
+  ]
+}

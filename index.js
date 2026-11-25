@@ -1,4 +1,4 @@
-﻿// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
+// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
 // 独立运行：不 import beat / fade / fanfic，不读它们的运行时。
 
 import { VERSION, PLUGIN_NAME, ROOT_DIR } from './lib/consts.js'
@@ -9,6 +9,9 @@ import { briefForProfile } from './lib/compiler.js'
 import { listProfiles, loadProfile, summaryOf } from './lib/profile.js'
 import { readWatchlist } from './lib/watchlist.js'
 import { loadContract } from './lib/contract.js'
+import { readerSignals } from './lib/ratings.js'
+import { packSummaries, readPackConfig } from './lib/rules/index.js'
+import { personaBrief } from './lib/personas.js'
 
 export const name = 'novel-voice'
 export const inject = ['tools', 'commands']
@@ -45,6 +48,12 @@ const SKILL = {
     '- `voice_polish` 默认只报不改；要改必须显式 fix:true。它只改命中窗口，窗口外不动；校验不过会回退并标 needs-author。',
     '- 不要“为参差而拆句”，不要“让模型补具体”，不要整章重写——这两件事比 AI 味更糟。',
     '- 改写后必须复检；新增命中、新增数字/人名、与参考作品 20 字重合，都算失败。',
+    '',
+    '## 读者偏好（默认关，可选）',
+    '',
+    '- 读者用 `voice_rating record` 引用原文段落、标 like/dislike、给 1–5 强度；引用必须能在该章原文找到。',
+    '- 默认关；作者 `voice_rating enable` 并用 `confirm` 确认后，简报【写法】才会多一行读者偏好。',
+    '- 读者评分是读者输入，不是作品质量分；不要汇总成总分/排名，也不要为它训练模型。',
     '',
     '## 汇报口径',
     '',
@@ -102,7 +111,7 @@ function buildService(ctx) {
         plugin: PLUGIN_NAME,
         version: VERSION,
         service_version: 1,
-        capabilities: ['voice.brief', 'voice.status', 'voice.revision'],
+        capabilities: ['voice.brief', 'voice.status', 'voice.revision', 'voice.readerSignals', 'voice.rules', 'voice.fingerprint', 'voice.personaBrief'],
         dir: ROOT_DIR,
         readOnly: true,
       }
@@ -147,10 +156,41 @@ function buildService(ctx) {
       }
     },
 
+    async getReaderSignals({ cwd, dir, book } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const signals = await readerSignals(root, book)
+      const state = await readState(root, book)
+      return {
+        ok: true,
+        ...signals,
+        revision: state.revision,
+        generated_at: new Date().toISOString(),
+      }
+    },
+
+    async getPersonaBrief({ cwd, dir, book, chapter, cast } = {}) {
+      const root = serviceRoot({ cwd, dir })
+      const profile = await loadProfile(root, book, null).catch(() => null)
+      const result = await personaBrief(root, book, {
+        chapter,
+        cast,
+        characterStyles: profile?.characterStyles ?? [],
+      })
+      const state = await readState(root, book)
+      return { ok: true, ...result, revision: state.revision, generated_at: new Date().toISOString() }
+    },
+
     async getRules({ cwd, dir, book, profileId } = {}) {
       const root = serviceRoot({ cwd, dir })
       const profile = await loadProfile(root, book, profileId ?? null)
-      return { ok: Boolean(profile), profile: profile ? summaryOf(profile) : null, rules: profile?.rules ?? [] }
+      const config = await readPackConfig(root, book)
+      return {
+        ok: Boolean(profile),
+        profile: profile ? summaryOf(profile) : null,
+        rules: profile?.rules ?? [],
+        packs: await packSummaries(),
+        enabledPacks: config.enabled,
+      }
     },
 
     async getWatchlist({ cwd, dir, book } = {}) {

@@ -1,0 +1,343 @@
+{
+  "id": "zh-slop-core",
+  "title": "中文套话与结构陈词（humanizer-lint 子集）",
+  "version": "1.0.0",
+  "license": "MIT",
+  "source": {
+    "project": "humanizer-lint",
+    "version": "1.6.0",
+    "url": "https://github.com/yanstd888/humanizer-lint",
+    "license": "MIT"
+  },
+  "defaultEnabled": false,
+  "rules": [
+    {
+      "id": "ZH028",
+      "type": "NOT_X_BUT_Y",
+      "scope": "narration",
+      "severity": "warn",
+      "match": {
+        "kind": "regex",
+        "pattern": "不仅是[^。！？]{1,40}，?更是",
+        "flags": "u"
+      },
+      "message": "否定-修正句：先否定一个并不存在的说法，再抬高后半句",
+      "fix": "直接说主张；只有否定半边在纠正读者实际认知时才保留。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "ZH001",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "在当今快节奏的世界中"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH002",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "在数字化时代"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH003",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "值得注意的是"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH004",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "不可否认的是"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH005",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "总而言之"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH006",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "综上所述"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH008",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "更重要的是"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH009",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "扮演着至关重要的角色"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH012",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "深入探讨"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH013",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "这不仅关乎"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH014",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "见证了"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH015",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "双刃剑"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH016",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "在当前环境下"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH017",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "毋庸置疑"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH018",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "需要指出的是"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH019",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "随着时代的发展"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH020",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "从本质上讲"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH021",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "在不断变化的格局中"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH022",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "开启了新的篇章"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH023",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "改变游戏规则"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH024",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "无缝衔接"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH025",
+      "type": "SLOP_PHRASE",
+      "scope": "all",
+      "severity": "warn",
+      "match": {
+        "kind": "phrase",
+        "pattern": "全方位的方法"
+      },
+      "message": "套话/空泛短语",
+      "fix": "删掉，或换成具体事实、人物或动作。",
+      "evidenceLevel": "direct"
+    },
+    {
+      "id": "ZH026",
+      "type": "DEFINITIONAL_OPENING",
+      "scope": "narration",
+      "severity": "warn",
+      "match": {
+        "kind": "regex",
+        "pattern": "^(?:在.*?的背景下|在.*?领域中|在.*?世界里)，",
+        "flags": "u"
+      },
+      "message": "定义式开头：先给大背景再进正文",
+      "fix": "从具体场景、人物或动作开头。",
+      "evidenceLevel": "indirect"
+    },
+    {
+      "id": "ZH027",
+      "type": "STRUCTURAL_CLICHE",
+      "scope": "narration",
+      "severity": "warn",
+      "match": {
+        "kind": "regex",
+        "pattern": "不仅[\\s\\S]{0,100}?而且",
+        "flags": "u"
+      },
+      "message": "结构套式：不仅…而且…",
+      "fix": "拆成两个具体事实，不用固定搭配。",
+      "evidenceLevel": "indirect"
+    }
+  ]
+}

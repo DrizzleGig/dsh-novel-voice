@@ -1,6 +1,6 @@
 {
   "name": "dsh-novel-voice",
-  "version": "0.2.2",
+  "version": "0.4.0",
   "description": "导入你喜欢的小说与自己的旧稿，在本地提炼成可解释、可回滚的风格档案；写前编译 600 字简报，写后把 AI 味定位到句子，只改命中那一句。默认关闭，不打分，不训练模型。",
   "type": "module",
   "main": "index.js",
@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "node --check index.js && node --check client.js && node --check lib/remote.js && node --check lib/remote-contract.js && node --check lib/tools.js && node scripts/check-surface.mjs && node --check lib/tool-schema.mjs",
+    "check": "node --check index.js && node --check client.js && node --check lib/remote.js && node --check lib/remote-contract.js && node --check lib/tools.js && node --check lib/ratings.js && node --check lib/personas.js && node --check lib/fingerprint.js && node --check lib/rules/engine.js && node --check lib/rules/index.js && node scripts/check-surface.mjs && node --check lib/tool-schema.mjs",
+    "check:licenses": "node scripts/check-licenses.mjs",
     "eval": "node scripts/eval-deslop.mjs"
   },
   "files": [
@@ -26,7 +27,10 @@
     "icon.svg",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSES",
+    "vendor"
   ],
   "keywords": [
     "dsh",

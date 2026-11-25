@@ -86,6 +86,7 @@ test('工具：导入 → 统计 → 档案 → 模板 → 确认 → 简报，�
   assert.match(brief.markdown, /【写法】/)
   assert.match(brief.markdown, /【不要】/)
   assert.match(brief.markdown, /【样段】/)
+  assert.match(brief.markdown, /【指纹】/)
   assert.ok(brief.chars <= 600)
 })
 

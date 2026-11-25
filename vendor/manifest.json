@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-25",
+  "note": "voice 的第三方来源登记表。status=planned 表示尚未复制代码，只登记计划；status=vendored 时必须列出 lib/vendor/ 下的文件与 sha256，并附许可与 NOTICE。",
+  "items": [
+    {
+      "name": "humanizer-lint",
+      "version": "1.6.0",
+      "license": "MIT",
+      "upstream": "https://github.com/yanstd888/humanizer-lint",
+      "status": "vendored",
+      "usedIn": ["lib/rules/packs/zh-slop-core.json", "lib/rules/engine.js"],
+      "files": [
+        {
+          "path": "lib/vendor/humanizer-lint/zh-slop.json",
+          "sha256": "e32e0cbf2fb342e8c9a69a8f8df2d2858cb02603377e46199b938a2cdd84a6d9"
+        }
+      ],
+      "modified": false,
+      "notice": false,
+      "note": "只取 zh-slop 规则；不改上游 JSON；zh-slop-core.json 是过滤了 ZH007/ZH010/ZH011 并加中文字段说明的派生包。"
+    },
+    {
+      "name": "patina",
+      "version": "9.1.0",
+      "license": "MIT",
+      "upstream": "https://github.com/devswha/patina",
+      "status": "planned",
+      "usedIn": ["lib/rules/packs/zh-fiction.json", "lib/fingerprint.js"],
+      "files": [],
+      "modified": false,
+      "notice": false,
+      "note": "只抽 zh pattern / 确定性 stylometry 思路；不带 CLI、LLM、entitlement。"
+    },
+    {
+      "name": "sloptrim",
+      "version": "0.9.7",
+      "license": "Apache-2.0",
+      "upstream": "https://github.com/seyedehsanhadi/sloptrim",
+      "status": "planned",
+      "usedIn": ["lib/rules/packs/zh-fiction.json"],
+      "files": [],
+      "modified": false,
+      "notice": true,
+      "note": "只移植可判定的结构性 pattern；随包附 Apache-2.0 与 NOTICE，注明修改。"
+    },
+    {
+      "name": "qu-ai-wei",
+      "version": "unknown",
+      "license": "MIT",
+      "upstream": "https://github.com/LifelongLazyLearner/qu-ai-wei",
+      "status": "ported",
+      "usedIn": ["lib/rules/packs/zh-fiction.json"],
+      "files": [],
+      "modified": true,
+      "notice": false,
+      "note": "借中文症状分类与证据等级；规则与文案为本项目重写，不复制大段提示。"
+    },
+    {
+      "name": "sepia",
+      "version": "unknown",
+      "license": "MIT",
+      "upstream": "https://github.com/Nanako0129/sepia",
+      "status": "ported",
+      "usedIn": ["lib/rules/packs/zh-fiction.json", "lib/rules/packs/zh-narrative.json"],
+      "files": [],
+      "modified": true,
+      "notice": false,
+      "note": "借中文小说症状分类与检查思路；规则文案重写；不复制 HC3-Chinese 等数据集。"
+    },
+    {
+      "name": "humanizer",
+      "version": "4.0.0",
+      "license": "MIT (upstream text is based on CC BY-SA 4.0 Wikipedia)",
+      "upstream": "https://github.com/blader/humanizer",
+      "status": "idea-only",
+      "usedIn": [],
+      "files": [],
+      "modified": false,
+      "notice": false,
+      "note": "只借结构分类，不复制 SKILL.md/规则原文/例句，避免 share-alike 衍生风险。"
+    },
+    {
+      "name": "BookNLP",
+      "version": "unknown",
+      "license": "MIT",
+      "upstream": "https://github.com/booknlp/booknlp",
+      "status": "idea-only",
+      "usedIn": ["lib/persona/ (planned)"],
+      "files": [],
+      "modified": false,
+      "notice": false,
+      "note": "Python 离线参考，不进 Node 运行时。"
+    },
+    {
+      "name": "Yorishiro",
+      "version": "unknown",
+      "license": "MIT",
+      "upstream": "https://github.com/swordfeng/yorishiro",
+      "status": "idea-only",
+      "usedIn": ["lib/persona/ (planned)"],
+      "files": [],
+      "modified": false,
+      "notice": false,
+      "note": "只借人物卡 schema/证据边界，不复制代码。"
+    }
+  ]
+}
+

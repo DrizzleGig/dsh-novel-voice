@@ -53,6 +53,12 @@ window.__ModuleLoader__.load({
         ['verifyEvidence', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['saveWeights', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['setRuleStatus', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['setRulePacks', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['setPersonaStatus', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['personaDetail', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['readerToggle', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['readerRecord', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
+        ['readerDecide', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['addBan', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['aggregate', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
         ['acceptCandidate', [param('sessionId', sessionIdSchema), param('options', jsonObjectSchema)], panelResultSchema, 'VoicePanel'],
@@ -98,6 +104,40 @@ window.__ModuleLoader__.load({
       mono: '"Cascadia Mono", Consolas, monospace',
     }
     const MODE_COLOR = { 'm-immersive': T.accent, 'm-tight': T.mark, 'm-restrained': T.ok }
+    const THEME_OPTIONS = [
+      { id: 'auto', label: '跟随宿主', vars: {} },
+      {
+        id: 'paper', label: '纸白',
+        vars: {
+          '--dsw-alias-bg-base': '#f3eee4', '--dsw-alias-bg-l1': '#faf6ec', '--dsw-alias-bg-l2': '#efe7d8',
+          '--dsw-alias-label-primary': '#2a2620', '--dsw-alias-label-secondary': '#756c5e', '--dsw-alias-label-tertiary': '#a39886',
+          '--dsw-alias-border-l1': '#d8cdbb', '--dsw-alias-border-l2': '#c6b9a4',
+          '--dsw-alias-brand-primary': '#8e4a32', '--dsw-alias-label-inverse': '#f7f4ee',
+          '--dsw-alias-state-warning': '#a83a2c', '--dsw-alias-state-success': '#3f6f5b',
+        },
+      },
+      {
+        id: 'white', label: '白纸',
+        vars: {
+          '--dsw-alias-bg-base': '#f7f7f7', '--dsw-alias-bg-l1': '#ffffff', '--dsw-alias-bg-l2': '#f0f0f0',
+          '--dsw-alias-label-primary': '#1f1f1f', '--dsw-alias-label-secondary': '#66605a', '--dsw-alias-label-tertiary': '#99938b',
+          '--dsw-alias-border-l1': '#e3e3e3', '--dsw-alias-border-l2': '#cfcfcf',
+          '--dsw-alias-brand-primary': '#3f4f9e', '--dsw-alias-label-inverse': '#ffffff',
+          '--dsw-alias-state-warning': '#a84a3a', '--dsw-alias-state-success': '#3f6f5b',
+        },
+      },
+      {
+        id: 'dark', label: '墨黑',
+        vars: {
+          '--dsw-alias-bg-base': '#1f1c17', '--dsw-alias-bg-l1': '#27231d', '--dsw-alias-bg-l2': '#302b24',
+          '--dsw-alias-label-primary': '#ece5d8', '--dsw-alias-label-secondary': '#b4a996', '--dsw-alias-label-tertiary': '#83796a',
+          '--dsw-alias-border-l1': '#3d372e', '--dsw-alias-border-l2': '#51483b',
+          '--dsw-alias-brand-primary': '#8aa0d8', '--dsw-alias-label-inverse': '#1f1c17',
+          '--dsw-alias-state-warning': '#d27a6b', '--dsw-alias-state-success': '#7fa995',
+        },
+      },
+    ]
+    const THEME_BY_ID = new Map(THEME_OPTIONS.map((item) => [item.id, item]))
     const SCENE_ORDER = ['日常过渡', '动作战斗', '悬疑对峙', '对话', '心理情感', '描写环境']
     const SCENE_LABEL = { 日常过渡: '日常', 动作战斗: '战斗', 悬疑对峙: '对峙', 对话: '对话', 心理情感: '心理', 描写环境: '描写' }
     const ACTION_LABEL = {
@@ -116,7 +156,10 @@ window.__ModuleLoader__.load({
     }
     const PANEL_CSS = `
       .dsh-voice-panel button:focus { outline: none; }
-      .dsh-voice-panel button:focus-visible { outline: 2px solid ${T.accent}; outline-offset: 1px; }
+      .dsh-voice-panel button:focus-visible, .dsh-voice-panel input:focus-visible,
+      .dsh-voice-panel textarea:focus-visible, .dsh-voice-panel select:focus-visible {
+        outline: 2px solid ${T.accent}; outline-offset: 1px;
+      }
       .dsh-voice-panel input[type="range"] { accent-color: ${T.accent}; }
       .dsh-voice-panel ::selection { background: ${T.accentSoft}; }
       .dsh-voice-panel .dsh-tab, .dsh-voice-panel .dsh-seg { border: 0; }
@@ -258,7 +301,48 @@ window.__ModuleLoader__.load({
     }
 
     function Sheet({ kicker, title, onClose, children, footer }) {
+      const ref = React.useRef(null)
+      const closeRef = React.useRef(onClose)
+      closeRef.current = onClose
+      React.useEffect(() => {
+        const node = ref.current
+        if (!node) return undefined
+        const previous = document.activeElement
+        const focusables = () => Array.from(node.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'))
+          .filter((element) => !element.disabled)
+        const first = focusables()[0]
+        if (first && typeof first.focus === 'function') first.focus()
+        const onKeyDown = (event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault()
+            closeRef.current?.()
+            return
+          }
+          if (event.key !== 'Tab') return
+          const list = focusables()
+          if (!list.length) return
+          const index = list.indexOf(document.activeElement)
+          if (event.shiftKey) {
+            if (index <= 0) {
+              event.preventDefault()
+              list[list.length - 1].focus()
+            }
+          } else if (index < 0 || index === list.length - 1) {
+            event.preventDefault()
+            list[0].focus()
+          }
+        }
+        document.addEventListener('keydown', onKeyDown)
+        return () => {
+          document.removeEventListener('keydown', onKeyDown)
+          if (previous && typeof previous.focus === 'function') previous.focus()
+        }
+      }, [])
       return h('div', {
+        ref,
+        role: 'dialog',
+        'aria-modal': 'true',
+        'aria-label': title,
         style: {
           position: 'absolute', inset: 0, zIndex: 20, display: 'flex', flexDirection: 'column',
           background: T.bg, color: T.ink,
@@ -278,6 +362,8 @@ window.__ModuleLoader__.load({
     function Toast({ text }) {
       if (!text) return null
       return h('div', {
+        role: 'status',
+        'aria-live': 'polite',
         style: {
           position: 'absolute', left: 12, right: 12, bottom: 58, zIndex: 30,
           background: T.ink, color: T.bg, fontSize: 10, lineHeight: 1.5, padding: '6px 9px',
@@ -377,7 +463,7 @@ window.__ModuleLoader__.load({
         h(Mono, null, `共 ${totalEvidence ?? 0} 条`)))
     }
 
-    function ProfileTab({ snap, onBrief, briefBusy, onCreateProfile, onSaveWeights, saving, onExtract, extracting, onMirror, onEvidence, onHistory }) {
+    function ProfileTab({ snap, onBrief, briefBusy, onCreateProfile, onSaveWeights, saving, onExtract, extracting, onMirror, onEvidence, onHistory, onRules, onPersonas, onReader }) {
       const profile = snap?.profile
       if (!profile) {
         return h(Empty, {
@@ -437,6 +523,18 @@ window.__ModuleLoader__.load({
         h(SectionHead, { kicker: 'Weights', title: '模式权重', action: null }),
         h(WeightEditor, { profile, onSave: onSaveWeights, saving }),
         h(SectionHead, { kicker: 'Timeline', title: '档案时间线', action: '查看', onAction: onHistory }),
+        h(SectionHead, { kicker: 'Rules', title: '规则包', action: '查看', onAction: onRules }),
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0 5px', fontSize: 9.5, color: T.muted } },
+          h(Icon, { name: 'sliders', size: 13, style: { color: T.accent } }),
+          h('span', null, `${(snap?.enabledPacks ?? []).length} 个启用 · ${(snap?.packs ?? []).length} 个可用 · 默认关`)),
+        h(SectionHead, { kicker: 'Personas', title: '人物卡', action: '查看', onAction: onPersonas }),
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0 5px', fontSize: 9.5, color: T.muted } },
+          h(Icon, { name: 'book', size: 13, style: { color: T.accent } }),
+          h('span', null, `${(snap?.personas ?? []).length} 张 · ${(snap?.personas ?? []).filter((persona) => persona.status === 'confirmed').length} 张已确认`)),
+        h(SectionHead, { kicker: 'Reader', title: '读者偏好', action: '查看', onAction: onReader }),
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0 5px', fontSize: 9.5, color: T.muted } },
+          h(Icon, { name: 'spark', size: 13, style: { color: T.accent } }),
+          h('span', null, `${(snap?.reader?.items ?? []).length} 条 · ${snap?.reader?.enabled ? '已开' : '默认关'}`)),
         h('div', { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '5px 0', fontSize: 9.5, color: T.muted } },
           h(Icon, { name: 'history', size: 13, style: { color: T.accent } }),
           h('span', null, `当前 v${profile.version} · revision ${snap.revision ?? profile.revision ?? '—'}`),
@@ -482,6 +580,293 @@ window.__ModuleLoader__.load({
     /* ════════════════════════════════════════════════════════════════════════
      * 3. Sheets
      * ════════════════════════════════════════════════════════════════════════ */
+    function ReaderSheet({ snap, onClose, remote, sessionId, onChanged, onToast }) {
+      const enabled = snap?.reader?.enabled === true
+      const items = snap?.reader?.items ?? []
+      const works = snap?.works ?? []
+      const [workId, setWorkId] = React.useState(works[0]?.workId ?? '')
+      const [chapter, setChapter] = React.useState('1')
+      const [chapterData, setChapterData] = React.useState(null)
+      const [chapterBusy, setChapterBusy] = React.useState(false)
+      const [selected, setSelected] = React.useState(null)
+      const loadSeq = React.useRef(0)
+      const [polarity, setPolarity] = React.useState('like')
+      const [strength, setStrength] = React.useState(5)
+      const [reader, setReader] = React.useState('')
+      const [busy, setBusy] = React.useState(false)
+
+      const paragraphs = React.useMemo(() => {
+        const text = chapterData?.text ?? ''
+        const out = []
+        let cursor = 0
+        for (const line of text.split('\n')) {
+          const trimmed = line.trim()
+          const lineStart = cursor + Math.max(0, line.indexOf(trimmed))
+          cursor += line.length + 1
+          if (trimmed.length < 4) continue
+          const chunks = trimmed.length <= 200
+            ? [trimmed]
+            : (trimmed.match(/[^。！？!?…]{1,199}[。！？!?…]?/g) ?? [trimmed]).filter((chunk) => chunk.trim().length >= 4)
+          let local = 0
+          for (const chunk of chunks) {
+            const at = trimmed.indexOf(chunk, local)
+            const start = lineStart + (at >= 0 ? at : local)
+            out.push({ text: chunk, start })
+            local = (at >= 0 ? at : local) + chunk.length
+          }
+        }
+        return out.slice(0, 200)
+      }, [chapterData])
+
+      const loadChapter = async () => {
+        if (!workId) {
+          onToast?.('先选作品')
+          return
+        }
+        const seq = loadSeq.current + 1
+        loadSeq.current = seq
+        const requestedChapter = Number(chapter) || 1
+        setChapterBusy(true)
+        try {
+          const data = await remote.chapterText(sessionId, {
+            book: snap?.book, workId, chapter: requestedChapter,
+          }).then(unwrap)
+          if (loadSeq.current !== seq) return
+          setChapterData(data)
+          setSelected(null)
+        } catch (cause) {
+          if (loadSeq.current === seq) onToast?.(String(cause?.message ?? cause))
+        } finally {
+          if (loadSeq.current === seq) setChapterBusy(false)
+        }
+      }
+
+      const toggle = async () => {
+        setBusy(true)
+        try {
+          await remote.readerToggle(sessionId, { book: snap?.book, on: !enabled }).then(unwrap)
+          onChanged?.()
+          onToast?.(enabled ? '读者偏好已关' : '读者偏好已开')
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setBusy(false)
+        }
+      }
+
+      const record = async () => {
+        if (!selected) {
+          onToast?.('先在章节里点一段作为引用')
+          return
+        }
+        const targetChapter = Number(chapterData?.chapter) || Number(chapter) || 1
+        setBusy(true)
+        try {
+          await remote.readerRecord(sessionId, {
+            book: snap?.book, workId, chapter: targetChapter,
+            quote: selected.text, start: selected.start,
+            polarity, strength, reader: reader.trim() || undefined,
+          }).then(unwrap)
+          setSelected(null)
+          onChanged?.()
+          onToast?.('读者评分已记录，待作者确认')
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setBusy(false)
+        }
+      }
+
+      const decide = async (item, status) => {
+        setBusy(true)
+        try {
+          await remote.readerDecide(sessionId, { book: snap?.book, ids: [item.id], status }).then(unwrap)
+          onChanged?.()
+          onToast?.(status === 'confirmed' ? '已确认这条读者偏好' : '已拒绝')
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setBusy(false)
+        }
+      }
+
+      const selectStyle = { width: '100%', background: T.card, color: T.ink, border: `1px solid ${T.line}`, borderRadius: 2, padding: '6px 7px', fontFamily: T.sans, fontSize: 10.5 }
+      return h(Sheet, {
+        kicker: 'Reader', title: '读者偏好', onClose,
+        footer: h(Btn, { ghost: true, onClick: onClose, style: { width: '100%' } }, '回到档案'),
+      },
+        h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, margin: '2px 0 8px' } },
+          h('div', { style: { flex: 1, fontSize: 9.4, lineHeight: 1.55, color: T.muted } },
+            '默认关；作者确认后的读者偏好才进 voice_brief 的【写法】和 beat。读者评分不是作品质量分。'),
+          h(Btn, { quiet: true, onClick: toggle, disabled: busy, style: { fontSize: 9.5 } }, enabled ? '关闭' : '开启')),
+        works.length ? h(Card, { style: { marginBottom: 9 } },
+          h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 62px 58px', gap: 6 } },
+            h('select', {
+              value: workId,
+              onChange: (event) => { loadSeq.current += 1; setWorkId(event.target.value); setChapterData(null); setSelected(null) },
+              style: selectStyle,
+            }, works.map((work) => h('option', { key: work.workId, value: work.workId }, work.title))),
+            h('input', { value: chapter, onChange: (event) => { loadSeq.current += 1; setChapter(event.target.value); setChapterData(null); setSelected(null) }, inputMode: 'numeric', style: selectStyle, placeholder: '章' }),
+            h(Btn, { ghost: true, onClick: loadChapter, disabled: chapterBusy, style: { padding: '5px 6px', fontSize: 9.2 } }, chapterBusy ? '载入…' : '载入本章')),
+          chapterData ? h('div', null,
+            h('div', { style: { fontSize: 8.8, color: T.faint, marginTop: 6 } },
+              `${chapterData.chapterTitle ?? ''} · 点一段作为引用（存章节/位置/hash）`),
+            h('div', {
+              style: { maxHeight: 210, overflow: 'auto', border: `1px solid ${T.line}`, background: T.bg, marginTop: 5 },
+            }, paragraphs.length ? paragraphs.map((paragraph) => h('button', {
+              key: paragraph.start,
+              type: 'button',
+              onClick: () => setSelected(paragraph),
+              style: {
+                display: 'block', width: '100%', textAlign: 'left', cursor: 'pointer',
+                appearance: 'none', border: 0, borderLeft: `2px solid ${selected?.start === paragraph.start ? T.mark : 'transparent'}`,
+                background: selected?.start === paragraph.start ? T.accentSoft : 'transparent',
+                padding: '5px 8px', fontFamily: T.sans, fontSize: 9.6, lineHeight: 1.6, color: T.ink,
+              },
+            }, paragraph.text)) : h('div', { style: { padding: 8, fontSize: 9.4, color: T.faint } }, '这一章没有可引用的段落。')),
+            selected ? h('div', { style: { marginTop: 6, padding: '6px 8px', background: T.card2, borderLeft: `2px solid ${T.mark}`, fontSize: 9.4, lineHeight: 1.6, color: T.ink } },
+              `已选：「${selected.text.slice(0, 80)}${selected.text.length > 80 ? '…' : ''}」`) : h('div', { style: { marginTop: 5, fontSize: 8.8, color: T.faint } }, '还没有选段落。')) : h('div', { style: { marginTop: 6, fontSize: 8.8, color: T.faint } }, '选作品和章后点「载入本章」，就能从原文里选喜欢/不喜欢的段落。'),
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 4, marginTop: 7 } },
+            [1, 2, 3, 4, 5].map((value) => h('button', {
+              key: value,
+              type: 'button',
+              'aria-label': `${value} 星`,
+              onClick: () => setStrength(value),
+              style: {
+                appearance: 'none', border: 0, background: 'transparent', cursor: 'pointer',
+                padding: 0, fontSize: 19, lineHeight: 1, color: value <= strength ? T.mark : T.line2,
+              },
+            }, value <= strength ? '★' : '☆')),
+            h(Mono, { style: { marginLeft: 4 } }, `${strength}/5`)),
+          h('div', { style: { display: 'flex', gap: 6, marginTop: 6, alignItems: 'center' } },
+            h(Btn, { primary: polarity === 'like', ghost: polarity !== 'like', onClick: () => setPolarity('like'), style: { flex: 1, padding: '4px 7px', fontSize: 9.5 } }, '喜欢'),
+            h(Btn, { primary: polarity === 'dislike', ghost: polarity !== 'dislike', onClick: () => setPolarity('dislike'), style: { flex: 1, padding: '4px 7px', fontSize: 9.5 } }, '不喜欢'),
+            h('input', { value: reader, onChange: (event) => setReader(event.target.value), style: { ...selectStyle, width: 92, flex: '0 0 92px' }, placeholder: '读者（可空）' })),
+          h(Btn, { primary: true, onClick: record, disabled: busy || !selected, style: { width: '100%', marginTop: 7, padding: '6px 8px' } }, busy ? '保存中…' : '记录这条评分')) : h('div', { style: { fontSize: 9.5, color: T.faint, padding: '4px 0 8px' } }, '先导入作品，读者才能引用。'),
+        h(SectionHead, { kicker: 'Signals', title: '已记录', action: String(items.length), onAction: null }),
+        items.length ? items.map((item) => h(Card, { key: item.id, style: { marginBottom: 6 } },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+            h(Tag, { tone: item.status === 'confirmed' ? 'ok' : item.status === 'rejected' ? 'muted' : 'mark' },
+              item.status === 'confirmed' ? '已确认' : item.status === 'rejected' ? '已拒绝' : '待确认'),
+            h(Mono, null, `${item.polarity === 'like' ? '喜欢' : '不喜欢'} · ${item.strength} 星 · 第 ${item.chapter} 章`)),
+          h('div', { style: { fontSize: 9.8, lineHeight: 1.6, color: T.ink, marginTop: 5 } }, `「${item.quote}」`),
+          item.status === 'pending' ? h('div', { style: { display: 'flex', gap: 6, marginTop: 7 } },
+            h(Btn, { primary: true, onClick: () => decide(item, 'confirmed'), disabled: busy, style: { flex: 1, padding: '4px 7px', fontSize: 9.5 } }, '确认进简报'),
+            h(Btn, { ghost: true, onClick: () => decide(item, 'rejected'), disabled: busy, style: { padding: '4px 7px', fontSize: 9.5 } }, '拒绝')) : null))
+          : h('div', { style: { fontSize: 9.5, color: T.faint, padding: '4px 0' } }, '还没有读者评分。'))
+    }
+
+    function PersonaSheet({ snap, onClose, remote, sessionId, onChanged, onToast }) {
+      const personas = snap?.personas ?? []
+      const [saving, setSaving] = React.useState(null)
+      const [detail, setDetail] = React.useState(null)
+      const [detailBusy, setDetailBusy] = React.useState(null)
+      const fieldLabel = { personality: '性格', values: '价值取向', decision: '决策方式', relationship: '关系脚本', stress: '压力反应', behavior: '行为倾向', taboo: '禁忌' }
+      const channelLabel = { narration: '叙述', inner: '内心', action: '行动', choice: '选择', dialogue: '对白' }
+      const openDetail = async (persona) => {
+        setDetailBusy(persona.personaId)
+        try {
+          const result = await remote.personaDetail(sessionId, { book: snap?.book, personaId: persona.personaId }).then(unwrap)
+          setDetail(result.persona)
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setDetailBusy(null)
+        }
+      }
+      const decide = async (persona, status) => {
+        setSaving(persona.personaId)
+        try {
+          await remote.setPersonaStatus(sessionId, { book: snap?.book, personaId: persona.personaId, status }).then(unwrap)
+          setDetail(null)
+          onChanged?.()
+          onToast?.(status === 'confirmed' ? `已确认「${persona.name}」` : `已拒绝「${persona.name}」`)
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setSaving(null)
+        }
+      }
+      return h(Sheet, {
+        kicker: 'Personas', title: '人物卡', onClose,
+        footer: h(Btn, { ghost: true, onClick: onClose, style: { width: '100%' } }, '回到档案'),
+      },
+        h('div', { style: { fontSize: 9.4, lineHeight: 1.65, color: T.muted, padding: '2px 0 8px' } },
+          '人物卡默认是 candidate；作者确认后才会进 getPersonaBrief 和 beat 的 personaText。全部对白证据不能确认。'),
+        detail ? h(Card, { marked: true, style: { marginBottom: 8 } },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+            h('div', { style: { flex: 1, fontSize: 10.8, fontWeight: 600, color: T.ink } }, `${detail.name} · 主张与证据`),
+            h(Btn, { quiet: true, onClick: () => setDetail(null), style: { fontSize: 9.2 } }, '收起')),
+          (detail.claims ?? []).map((claim) => h('div', { key: claim.id, style: { marginTop: 8, borderTop: `1px solid ${T.line}`, paddingTop: 7 } },
+            h(Mono, null, `${fieldLabel[claim.field] ?? claim.field}${claim.confidence != null ? ` · 置信 ${claim.confidence}` : ''}`),
+            h('div', { style: { fontSize: 10, lineHeight: 1.6, color: T.ink, marginTop: 3 } }, claim.text),
+            claim.situation ? h('div', { style: { fontSize: 9, color: T.faint, marginTop: 2 } }, `情境：${claim.situation}`) : null,
+            (claim.evidence ?? []).map((item, index) => h('div', { key: index, style: { fontSize: 9, lineHeight: 1.55, color: T.muted, marginTop: 3 } },
+              `第 ${item.chapter} 章 · ${channelLabel[item.channel] ?? item.channel}：「${item.quote}」`)),
+            (claim.counterEvidence ?? []).length ? h('div', { style: { fontSize: 9, lineHeight: 1.55, color: T.mark, marginTop: 3 } },
+              `反例：${claim.counterEvidence.map((item) => `第 ${item.chapter} 章「${item.quote}」`).join('；')}`) : null)))
+          : null,
+        personas.length ? personas.map((persona) => h(Card, { key: persona.personaId, style: { marginBottom: 7 } },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+            h('div', { style: { flex: 1, minWidth: 0, fontSize: 10.8, fontWeight: 600, color: T.ink } }, persona.name),
+            h(Tag, { tone: persona.status === 'confirmed' ? 'ok' : persona.status === 'rejected' ? 'muted' : 'mark' },
+              persona.status === 'confirmed' ? '已确认' : persona.status === 'rejected' ? '已拒绝' : '候选')),
+          h(Mono, { style: { marginTop: 5, display: 'block' } },
+            `${persona.claims} 条主张 · ${persona.workId} · v${persona.revision}`),
+          h('div', { style: { display: 'flex', gap: 6, marginTop: 8 } },
+            h(Btn, { quiet: true, disabled: detailBusy === persona.personaId, onClick: () => openDetail(persona), style: { fontSize: 9.5 } },
+              detailBusy === persona.personaId ? '读取中…' : '看主张/证据'),
+            persona.status !== 'confirmed' ? h(Btn, {
+              primary: true, disabled: saving === persona.personaId, onClick: () => decide(persona, 'confirmed'),
+              style: { flex: 1, padding: '5px 8px', fontSize: 10 },
+            }, saving === persona.personaId ? '保存中…' : '确认人物卡') : null,
+            persona.status !== 'rejected' ? h(Btn, {
+              ghost: true, disabled: saving === persona.personaId, onClick: () => decide(persona, 'rejected'),
+              style: { padding: '5px 8px', fontSize: 10 },
+            }, persona.status === 'confirmed' ? '撤销确认' : '拒绝') : null)))
+          : h(Empty, { icon: 'book', title: '还没有人物卡', lines: ['先在对话里用 voice_persona extract 或 propose 生成候选。'] }))
+    }
+
+    function RulesSheet({ snap, onClose, remote, sessionId, onChanged, onToast }) {
+      const packs = snap?.packs ?? []
+      const enabled = new Set(snap?.enabledPacks ?? [])
+      const [saving, setSaving] = React.useState(null)
+      const togglePack = async (pack) => {
+        if (saving) return
+        const next = enabled.has(pack.id)
+          ? [...enabled].filter((id) => id !== pack.id)
+          : [...enabled, pack.id]
+        setSaving(pack.id)
+        try {
+          await remote.setRulePacks(sessionId, { book: snap?.book, packs: next }).then(unwrap)
+          await onChanged?.()
+          onToast?.(enabled.has(pack.id) ? `已关闭「${pack.title}」` : `已启用「${pack.title}」`)
+        } catch (cause) {
+          onToast?.(String(cause?.message ?? cause))
+        } finally {
+          setSaving(null)
+        }
+      }
+      return h(Sheet, {
+        kicker: 'Rules', title: '规则包与许可', onClose,
+        footer: h(Btn, { ghost: true, onClick: onClose, style: { width: '100%' } }, '回到档案'),
+      },
+        h('div', { style: { fontSize: 9.4, lineHeight: 1.65, color: T.muted, padding: '2px 0 8px' } },
+          '规则包默认关；开启后 voice_check 才会带回 ruleFindings。来源与许可见 THIRD_PARTY_NOTICES.md / vendor/manifest.json。'),
+        packs.length ? packs.map((pack) => h(Card, { key: pack.id, style: { marginBottom: 7 } },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+            h('div', { style: { flex: 1, minWidth: 0, fontSize: 10.8, fontWeight: 600, color: T.ink } }, pack.title),
+            h(Btn, {
+              quiet: true, disabled: Boolean(saving), onClick: () => togglePack(pack),
+              style: { fontSize: 9.2, padding: '3px 7px', color: enabled.has(pack.id) ? T.mark : T.accent },
+            }, saving === pack.id ? '保存中…' : (enabled.has(pack.id) ? '关闭' : '启用'))),
+          h(Mono, { style: { marginTop: 5, display: 'block' } },
+            `${pack.ruleCount} 条 · ${pack.license} · ${pack.source?.project ?? '内置'} ${pack.source?.version ?? ''}`.trim()),
+          h('div', { style: { fontSize: 9.2, lineHeight: 1.6, color: T.faint, marginTop: 4 } },
+            pack.defaultEnabled ? '默认开' : '默认关；开启后 voice_check 才带回 ruleFindings')))
+          : h(Empty, { icon: 'sliders', title: '还没有规则包', lines: ['内置规则包随插件发布；这里是只读清单。'] }))
+    }
+
     function EvidenceSheet({ snap, filter, onClose, remote, sessionId, onToast }) {
       const [checks, setChecks] = React.useState({})
       const [checking, setChecking] = React.useState(null)
@@ -769,6 +1154,18 @@ window.__ModuleLoader__.load({
       const [sheet, setSheet] = React.useState(null)
       const [toast, setToast] = React.useState(null)
       const [busy, setBusy] = React.useState(null)
+      const [theme, setTheme] = React.useState(() => {
+        try {
+          const saved = localStorage.getItem('dsh-voice-theme')
+          return THEME_BY_ID.has(saved) ? saved : 'auto'
+        } catch {
+          return 'auto'
+        }
+      })
+      React.useEffect(() => {
+        try { localStorage.setItem('dsh-voice-theme', theme) } catch { /* 隐私模式忽略 */ }
+      }, [theme])
+      const themeVars = (THEME_BY_ID.get(theme) ?? THEME_BY_ID.get('auto')).vars
 
       const load = React.useCallback(async () => {
         if (!remote || !sessionId) { setPhase('error'); setError('面板服务还没挂载'); return }
@@ -817,6 +1214,9 @@ window.__ModuleLoader__.load({
       const openEvidence = (filter) => setSheet({ kind: 'evidence', filter: filter ?? {} })
       const openHistory = () => setSheet({ kind: 'timeline' })
       const openImport = () => setSheet({ kind: 'import' })
+      const openRules = () => setSheet({ kind: 'rules' })
+      const openPersonas = () => setSheet({ kind: 'personas' })
+      const openReader = () => setSheet({ kind: 'reader' })
 
       const importFolder = (sourceType) => run('import-folder', async () => {
         const result = await remote.importFolder(sessionId, { sourceType }).then(unwrap)
@@ -903,12 +1303,16 @@ window.__ModuleLoader__.load({
                 onCreateProfile: createProfile, onSaveWeights: saveWeights, saving: busy === 'weights',
                 onExtract: extractTechniques, extracting: busy === 'extract',
                 onMirror: openMirror, onEvidence: openEvidence, onHistory: openHistory,
+                onRules: openRules,
+                onPersonas: openPersonas,
+                onReader: openReader,
               })
               : h(LearnTab, { snap, onAccept: accept, onReject: reject, onHistory: openHistory })
 
       return h('div', {
         className: 'dsh-voice-panel',
         style: {
+          ...themeVars,
           position: 'relative', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0,
           background: T.bg, color: T.ink, fontFamily: T.sans, fontSize: 12, overflow: 'hidden',
         },
@@ -922,7 +1326,17 @@ window.__ModuleLoader__.load({
             h('div', { style: { flex: 1, minWidth: 0 } },
               h('div', { style: { fontFamily: T.serif, fontSize: 20, lineHeight: 1.15, letterSpacing: '.02em', fontWeight: 600 } }, '风格工作室'),
               h('div', { style: { fontSize: 9.8, color: T.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } },
-                `《${snap?.book ?? '—'}》 · ${snap?.works?.length ?? 0} 部作品 · 档案 v${snap?.profile?.version ?? '—'}`)),
+                `《${snap?.book ?? '—'}》 · ${snap?.works?.length ?? 0} 部作品 · 档案 v${snap?.profile?.version ?? '—'}`),
+              h(Mono, { style: { marginTop: 4, color: T.faint, fontSize: 8.4, letterSpacing: '.04em' } },
+                `WORKS ${snap?.works?.length ?? 0} · CHAPTERS ${(snap?.works ?? []).reduce((sum, work) => sum + (Number(work.chapters) || 0), 0)} · ${((snap?.works ?? []).reduce((sum, work) => sum + (Number(work.chars) || 0), 0) / 10000).toFixed(1)} 万字 · REV ${snap?.revision ?? '—'}`)),
+            h('select', {
+              value: theme, onChange: (event) => setTheme(event.target.value),
+              title: '底色', 'aria-label': '底色',
+              style: {
+                appearance: 'none', cursor: 'pointer', border: `1px solid ${T.line}`, background: 'transparent',
+                color: T.muted, borderRadius: 999, padding: '3px 6px', fontFamily: T.sans, fontSize: 8.6,
+              },
+            }, THEME_OPTIONS.map((option) => h('option', { key: option.id, value: option.id }, option.label))),
             h('button', {
               type: 'button', onClick: toggleMode, title: '切换 /voice on | off',
               style: {
@@ -931,16 +1345,23 @@ window.__ModuleLoader__.load({
               },
             }, h('i', { style: { width: 5, height: 5, borderRadius: 99, background: mode ? T.ok : T.faint } }), mode ? '开' : '关'),
             h(IconBtn, { icon: 'refresh', onClick: load, title: '重新读取' })),
-          h('div', { style: { display: 'flex', gap: 0, borderBottom: `1px solid ${T.line}`, marginTop: 12 } },
+          h('div', {
+            role: 'tablist', 'aria-label': '创作风格分页',
+            style: {
+              display: 'flex', gap: 2, background: T.card2, border: `1px solid ${T.line}`,
+              borderRadius: 999, padding: 2, marginTop: 12,
+            },
+          },
             tabs.map(([id, label, icon, count]) => h('button', {
-              key: id, type: 'button', className: 'dsh-tab', onClick: () => setTab(id),
+              key: id, type: 'button', role: 'tab', 'aria-selected': tab === id, className: 'dsh-tab', onClick: () => setTab(id),
               style: {
-                appearance: 'none', background: 'transparent', borderTop: 'none', borderLeft: 'none', borderRight: 'none', cursor: 'pointer', fontFamily: T.sans, fontSize: 11,
-                color: tab === id ? T.ink : T.muted, padding: '0 0 8px', marginRight: 20, position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 5,
-                borderBottom: `2px solid ${tab === id ? T.accent : 'transparent'}`, marginBottom: -1,
+                appearance: 'none', flex: 1, cursor: 'pointer', fontFamily: T.sans, fontSize: 10.4,
+                color: tab === id ? T.accentInk : T.muted, padding: '5px 3px', borderRadius: 999,
+                background: tab === id ? T.accent : 'transparent', border: 0,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
               },
-            }, h(Icon, { name: icon, size: 13, style: { opacity: tab === id ? 1 : 0.6 } }), label,
-              count ? h(Mono, { style: { color: tab === id ? T.accent : T.faint } }, count) : null)))),
+            }, h(Icon, { name: icon, size: 12, style: { opacity: tab === id ? 1 : 0.65 } }), label,
+              count ? h(Mono, { style: { color: tab === id ? T.accentInk : T.accent, fontSize: 8.2 } }, count) : null)))),
         h('div', { style: { flex: 1, minHeight: 0, overflow: 'auto', padding: '0 16px 12px' } },
           mode ? null : h('div', {
             style: { marginTop: 10, borderLeft: `2px solid ${T.mark}`, background: T.card2, padding: '6px 9px', fontSize: 9.3, lineHeight: 1.6, color: T.mark },
@@ -955,7 +1376,10 @@ window.__ModuleLoader__.load({
           : sheet.kind === 'mirror' ? h(MirrorSheet, { remote, sessionId, snap, onClose: () => setSheet(null), onToast: setToast })
             : sheet.kind === 'evidence' ? h(EvidenceSheet, { snap, filter: sheet.filter, onClose: () => setSheet(null), remote, sessionId, onToast: setToast })
               : sheet.kind === 'timeline' ? h(TimelineSheet, { snap, onClose: () => setSheet(null) })
-                : h(ImportSheet, { onClose: () => setSheet(null), onFolder: importFolder, onFiles: importFiles, onPath: importPath, busy: Boolean(busy) })) : null,
+                : sheet.kind === 'rules' ? h(RulesSheet, { snap, onClose: () => setSheet(null), remote, sessionId, onChanged: load, onToast: setToast })
+                  : sheet.kind === 'personas' ? h(PersonaSheet, { snap, onClose: () => setSheet(null), remote, sessionId, onChanged: load, onToast: setToast })
+                    : sheet.kind === 'reader' ? h(ReaderSheet, { snap, onClose: () => setSheet(null), remote, sessionId, onChanged: load, onToast: setToast })
+                      : h(ImportSheet, { onClose: () => setSheet(null), onFolder: importFolder, onFiles: importFiles, onPath: importPath, busy: Boolean(busy) })) : null,
         h(Toast, { text: toast }))
     }
 

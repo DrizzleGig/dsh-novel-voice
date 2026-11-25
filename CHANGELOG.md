@@ -1,3 +1,36 @@
+## 0.4.0 — 2026-11-26
+
+> 合并发布 0.3.0 风格底座、0.3.1 人物画像、0.3.2 A/B/C 与只读服务、0.4.0 读者偏好；0.3.x 未单独发布。npm 包 0.4.0。
+
+- 新增 `voice_rating`（第 8 个工具）：读者引用原文段落 + like/dislike + 1–5 强度；默认关，作者 confirm 后才进 brief；不训练模型、不给作品总分。
+- 新增 `lib/ratings.js` + `.dsh-novel-voice/<book>/ratings.jsonl` + `reader.json`；`voice_brief` 的 `【写法】` 增加“读者偏好（仅建议）”一行；beat 通过既有 `getBrief` 读取，不需要改 beat 代码。
+- 新增 `zh-slop-core` 规则包（humanizer-lint MIT 子集，25 条，默认关）+ `zh-fiction`（qu-ai-wei/sepia 派生，17 条，默认关）+ `zh-narrative`（sepia 派生，12 条，默认关）+ `lib/rules/engine.js` + `voice_profile action=packs/set-packs`；`voice_check` 返回 `ruleFindings`/`ruleSummary`/`rulePacks`，默认空。
+- 新增 `lib/fingerprint.js`；`voice_check` 返回 `fingerprint`（同输入同 hash，无评分）；`profile.stylometry` 在建档/重建时生成，`voice_brief` 在【硬约束】后附 2 行【指纹】，预算不足时先删指纹。
+- 档案面板“规则包”sheet 可在面板内启用/关闭规则包；来源、许可、条数、默认关状态可见。
+- 新增 `voice_persona`（0.3.1 预览，第 9 个工具）：`extract` 分批读作品、模型只提案、证据逐条回查；`propose` 接收手工/模型提案；默认 candidate，作者 `confirm` 后才生效；全部对白证据不能确认；写 `.dsh-novel-voice/<book>/personas/`。
+- 新增只读 `getPersonaBrief`（0.3.2 预览）：只含 confirmed 卡，支持 `profile.characterStyles` 的 A/B/C 绑定与字段级冲突并列；无卡返回 `available:false`；不返回分数。
+- beat 0.12.1 的 `loadVoiceGuidance` 可选读取 `getPersonaBrief`，以 `personaText` 随工具结果回传；只建议、250ms 超时、无 capability 降级。
+- `voice_check action=rank` 的公共 `items[]` 移除内部 `score`，保留 `closest` 索引；补回归测试。
+- 新增 `THIRD_PARTY_NOTICES.md`、`LICENSES/`、`vendor/manifest.json`、`npm run check:licenses`；`humanizer-lint` 的 zh-slop 规则按 MIT vendored；`check-surface` 的版本/工具数断言改为动态。
+- 档案面板新增“人物卡”sheet：候选/已确认/已拒绝列表，面板内确认/拒绝；点卡可看主张/证据通道/反例；确认后才会进 `getPersonaBrief` 与 beat `personaText`。
+- 档案面板新增“读者偏好”sheet：载入章节后从原文段落点选引用，五颗星 1–5，喜欢/不喜欢，读者可选；面板内开关与确认/拒绝；只有 confirmed 才进 brief/beat。
+- 面板改为分段页签；新增底色选择（跟随宿主/纸白/白纸/墨黑，仅面板内覆盖变量）。
+- 读者引用存 `workId / chapter / start / end / quote / quoteHash`，后端逐条回查原文；不存整章。
+- 面板顶部增加 folio 统计行（WORKS / CHAPTERS / 万字 / REV）；Sheet 增加 dialog 语义、Escape 关闭、Tab/Shift+Tab 环绕与焦点归还。
+- 修复：同一 `instruction` 的技法卡在简报里重复出现；`rankRules` 按 instruction 去重，补回归测试。
+- 新增 `zh-punctuation` 规则包（5 条，默认关）：只提示省略号/破折号/括号/引号规范，不改正文。
+- 真书测试：《斗罗大陆》GB18030 / 2,854,436 字 / 687 章；简报、规则包、指纹、rank、读者偏好链路通过，记录见 `docs/voice-斗罗真书风格测试-2026-11-25.md`。
+- 修复（Codex 审查）：读者改强度/标签/备注后重置 pending，只有完全相同的重试才保留 confirmed；人物分批 `maxBatches=1` 不再发空正文，超长场景按 maxChars 切片，对白引用即使伪报 narration 也按 dialogue 处理，`characterStyles` 绑定也受 `cast` 过滤；读者/人物证据 `start` 错位直接拒绝，不再猜首处匹配；坏 regex 规则包在加载时拒绝；读者章节载入竞态与规则包并发开关已串行。
+- 测试 85/85。
+
+### 已知限制（0.4.0）
+
+- 真书《斗罗大陆》2,854,436 字/687 章跑通链路，但原著章节的 20 字重合会 block，不是文风结论；作者新稿 block=0 对照未做。
+- 真实 DSH 宿主浅/深色截图、键盘手工复测、空态/失败态验收后置。
+- 人物 extract 真实模型效果未验收；测试用假 LLM。
+- fade 不做适配（作者决定）；beat 适配主要在 beat 段。
+- A/B/C 有数据与服务，无独立组合 UI。
+
 ## 0.2.2 — 2026-11-21
 
 - 接管：`applyAgentMode` 改用 `effectiveOn`，订阅 `novel-conductor/drive` 重算本会话（含 deny restrict 的收放）。

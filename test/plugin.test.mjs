@@ -36,7 +36,7 @@ test('插件：默认关闭，/voice on 之后工具才可见，/voice off 又�
   const { ctx, registered, commands, skills, provided } = fakeContext(dir)
   await apply(ctx, {})
 
-  assert.equal(registered.length, 7)
+  assert.equal(registered.length, 9)
   assert.equal(commands.length, 1)
   assert.equal(commands[0].name, 'voice')
   assert.equal(skills.length, 1)

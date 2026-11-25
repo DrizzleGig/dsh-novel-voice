@@ -74,6 +74,15 @@ test('rank 只给指针，不给好坏', () => {
   assert.match(result.note, /不代表写得更好/)
 })
 
+test('rank 不把内部排序分暴露到公共 items', () => {
+  const result = rank(['他推开门。雪落在肩上。', '他眼中闪过一丝犹豫。'], { watchlist })
+  for (const item of result.items) {
+    assert.equal('score' in item, false)
+    assert.equal('sortKey' in item, false)
+    assert.equal('total' in item, false)
+  }
+})
+
 test('选窗：合并相邻命中，限制窗口大小', () => {
   const text = '第一句。第二句。第三句。第四句。第五句。第六句。'
   const findings = [
@@ -160,6 +169,22 @@ test('简报：模式权重会改变规则排序', () => {
   const brief = buildBrief(profile, { chapter: 1, scene: '悬疑对峙' })
   assert.equal(brief.rules[0], 'r-001', '权重高的模式应先出它的规则')
   assert.ok(brief.markdown.indexOf('克制规则的内容') < brief.markdown.indexOf('沉浸规则的内容'))
+})
+
+test('简报：相同 instruction 只出现一次', () => {
+  const profile = {
+    id: 'p-dup', version: '1.0', status: 'confirmed', provisional: false,
+    identity: { summary: '克制。', avoid: [] }, bands: {},
+    blend: { global: {}, sceneWeights: {} }, modes: [],
+    rules: [
+      { id: 'r-1', status: 'confirmed', layer: 'L3', instruction: '同一句写法说明', scope: { sceneTypes: [] }, confidence: 0.9 },
+      { id: 'r-2', status: 'confirmed', layer: 'L3', instruction: '同一句写法说明', scope: { sceneTypes: [] }, confidence: 0.8 },
+    ],
+    anchors: [], samples: [], conflicts: [],
+  }
+  const brief = buildBrief(profile, { chapter: 1, scene: '日常过渡' })
+  assert.equal(brief.markdown.split('同一句写法说明').length - 1, 1)
+  assert.equal(brief.rules.length, 1)
 })
 
 test('简报：L2 节奏规则有保底名额', () => {
