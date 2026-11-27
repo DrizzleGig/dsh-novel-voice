@@ -124,13 +124,23 @@ test('voice_polish 写回拒绝工作区外路径，且外部文件字节不变'
   await fs.writeFile(outside, DRAFT, 'utf8')
   try {
     await assert.rejects(
-      () => tools(async () => DRAFT).get('voice_polish').execute({ dir, book: 'book', path: outside, write: true, fix: true }),
+      () => tools(async () => DRAFT).get('voice_polish').execute({ dir, book: 'book', path: outside, write: true, fix: true }, { cwd: dir }),
       (error) => error.code === 'path-outside',
     )
     assert.equal(await fs.readFile(outside, 'utf8'), DRAFT)
   } finally {
     await fs.rm(outside, { force: true })
   }
+})
+
+test('voice_polish 在拿不到宿主工作区时拒绝写回', async () => {
+  const dir = await workspace()
+  const file = path.join(dir, 'chapter.txt')
+  await fs.writeFile(file, DRAFT, 'utf8')
+  await assert.rejects(
+    () => tools().get('voice_polish').execute({ dir, book: 'book', path: file, write: true, fix: true }),
+    (error) => error.code === 'dir-untrusted',
+  )
 })
 
 test('voice_polish 拒绝模型可控 dir 越出宿主工作区', async () => {
