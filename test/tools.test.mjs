@@ -133,6 +133,25 @@ test('voice_polish 写回拒绝工作区外路径，且外部文件字节不变'
   }
 })
 
+test('voice_polish 拒绝模型可控 dir 越出宿主工作区', async () => {
+  const dir = await workspace()
+  const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), 'voice-outside-dir-'))
+  const outsideFile = path.join(outsideDir, 'chapter.txt')
+  await fs.writeFile(outsideFile, DRAFT, 'utf8')
+  try {
+    await assert.rejects(
+      () => tools().get('voice_polish').execute(
+        { dir: outsideDir, book: 'book', path: outsideFile, write: true, fix: true },
+        { cwd: dir },
+      ),
+      (error) => error.code === 'dir-outside',
+    )
+    assert.equal(await fs.readFile(outsideFile, 'utf8'), DRAFT)
+  } finally {
+    await fs.rm(outsideDir, { recursive: true, force: true })
+  }
+})
+
 test('定点改写：只改命中窗口，仍能过五道校验', async () => {
   const text = '他推开门，雪落在肩上。屋里没有灯，只有灶膛里一点红。他眼中闪过一丝犹豫，嘴角勾起一抹弧度。他站了一会儿，才把门带上。'
   const watchlist = { entries: defaultEntries() }

@@ -2,7 +2,7 @@
 
 - **多项目不串契约**：`loadContract` 在 `.dsh-novel-fanfic` 下有多个项目且调用方未显式传 `project` 时返回 `ambiguous-project`，不再默认取第一个项目；`voice_check`/`voice_polish` schema 新增可选 `project`，remote 面板同样支持。
 - **写回路径限制**：`voice_polish(write:true)` 只允许改工作区内已存在的普通文件；拒绝越界、符号链接逃逸与目录，外部文件字节不变。
-- 新增多项目歧义与越界写测试；`npm test` 86/86。
+- 新增多项目歧义、越界写与模型可控 `dir` 越界测试；`npm test` 87/87。
 
 ## 0.4.0 — 2026-11-26
 
