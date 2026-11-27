@@ -223,6 +223,14 @@ npm run check
 
 MIT License。
 
+## 共同作者
+
+**v0.1.0 共同作者：[MiyueWinter](https://github.com/MiyueWinter)** —— 文案、测试、设计与开发。
+
+## 喜欢它？
+
+如果「创作风格」帮你把喜欢的写法变成自己的文风，欢迎在 [GitHub](https://github.com/DrizzleGig/dsh-novel-voice) 点亮 ⭐，也欢迎 [Issue](https://github.com/DrizzleGig/dsh-novel-voice/issues) 或 [PR](https://github.com/DrizzleGig/dsh-novel-voice/pulls)。
+
 ## 链接
 
 - [GitHub 仓库](https://github.com/DrizzleGig/dsh-novel-voice)
