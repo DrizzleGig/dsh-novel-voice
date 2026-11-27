@@ -1,4 +1,9 @@
-## 0.4.1 — 2026-11-27 · 项目绑定与写回路径（本地版，未发布）
+## 0.4.2 — 2026-11-27 · README 徽章补发
+
+- README 顶部补 npm / license / GitHub Stars 三枚可点击徽章；无运行时代码变更。
+- `npm test` 沿用 0.4.1：88/88。
+
+## 0.4.1 — 2026-11-27 · 项目绑定与写回路径（已发布）
 
 - **多项目不串契约**：`loadContract` 在 `.dsh-novel-fanfic` 下有多个项目且调用方未显式传 `project` 时返回 `ambiguous-project`，不再默认取第一个项目；`voice_check`/`voice_polish` schema 新增可选 `project`，remote 面板同样支持。
 - **写回路径限制**：`voice_polish(write:true)` 只允许改工作区内已存在的普通文件；拒绝越界、符号链接逃逸与目录，外部文件字节不变。
