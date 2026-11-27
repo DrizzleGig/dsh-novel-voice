@@ -1,4 +1,4 @@
-// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名）
+// dsh-novel-voice · 创作风格（入口名）/ 风格工作室（面板名） · v0.4.1
 // 独立运行：不 import beat / fade / fanfic，不读它们的运行时。
 
 import { VERSION, PLUGIN_NAME, ROOT_DIR } from './lib/consts.js'

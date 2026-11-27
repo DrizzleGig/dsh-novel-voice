@@ -118,6 +118,21 @@ test('工具：rank 不判断好坏，只指出更接近档案的一份', async 
   assert.match(ranked.note, /不代表写得更好/)
 })
 
+test('voice_polish 写回拒绝工作区外路径，且外部文件字节不变', async () => {
+  const dir = await workspace()
+  const outside = path.join(path.dirname(dir), `voice-outside-${Date.now()}.txt`)
+  await fs.writeFile(outside, DRAFT, 'utf8')
+  try {
+    await assert.rejects(
+      () => tools(async () => DRAFT).get('voice_polish').execute({ dir, book: 'book', path: outside, write: true, fix: true }),
+      (error) => error.code === 'path-outside',
+    )
+    assert.equal(await fs.readFile(outside, 'utf8'), DRAFT)
+  } finally {
+    await fs.rm(outside, { force: true })
+  }
+})
+
 test('定点改写：只改命中窗口，仍能过五道校验', async () => {
   const text = '他推开门，雪落在肩上。屋里没有灯，只有灶膛里一点红。他眼中闪过一丝犹豫，嘴角勾起一抹弧度。他站了一会儿，才把门带上。'
   const watchlist = { entries: defaultEntries() }

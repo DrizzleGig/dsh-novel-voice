@@ -108,7 +108,11 @@ test('协作：voice → fanfic 读 project.json，旧 book.json 仍兼容，显
   await fs.mkdir(path.join(base, 'legacy'), { recursive: true })
   await fs.writeFile(path.join(base, 'legacy', 'book.json'), JSON.stringify({ forbidden: ['旧词'] }))
 
-  const modern = await loadContract(dir)
+  const ambiguous = await loadContract(dir)
+  assert.equal(ambiguous.available, false)
+  assert.equal(ambiguous.reason, 'ambiguous-project')
+
+  const modern = await loadContract(dir, { project: 'demo' })
   assert.equal(modern.available, true)
   assert.deepEqual(modern.forbidden, ['不许提剑'])
   assert.match(modern.source, /project\.json$/)
