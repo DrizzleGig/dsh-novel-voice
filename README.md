@@ -1,5 +1,9 @@
 # dsh-novel-voice
 
+[![npm version](https://img.shields.io/npm/v/dsh-novel-voice)](https://www.npmjs.com/package/dsh-novel-voice)
+[![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/DrizzleGig/dsh-novel-voice/blob/main/LICENSE)
+[![stars](https://img.shields.io/github/stars/DrizzleGig/dsh-novel-voice)](https://github.com/DrizzleGig/dsh-novel-voice/stargazers)
+
 **排字房：导入你喜欢的小说，学习写法；写前给 AI 文风简报，写后定位 AI 味，只修改命中的句子。**
 
 让 AI 学会你喜欢的表达方式，也让自己的写作习惯逐渐沉淀成可复用的文风档案。
